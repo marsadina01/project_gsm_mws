@@ -1,0 +1,194 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "E:\\Magang\\PK GS\\MWS Mold External\\gsm_mws\\gsm_mws\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{2E0686ED-645B-4DE7-B91E-9A25BFBFAC29}|E:\\Magang\\PK GS\\MWS Mold External\\gsm_mws\\gsm_mws|e:\\magang\\pk gs\\mws mold external\\gsm_mws\\gsm_mws\\addworkorder.aspx||{57312C73-6202-49E9-B1E1-40EA1A6DC1F6}",
+      "RelativeMoniker": "D:0:0:{2E0686ED-645B-4DE7-B91E-9A25BFBFAC29}|E:\\Magang\\PK GS\\MWS Mold External\\gsm_mws\\gsm_mws|solutionrelative:addworkorder.aspx||{57312C73-6202-49E9-B1E1-40EA1A6DC1F6}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{2E0686ED-645B-4DE7-B91E-9A25BFBFAC29}|E:\\Magang\\PK GS\\MWS Mold External\\gsm_mws\\gsm_mws|e:\\magang\\pk gs\\mws mold external\\gsm_mws\\gsm_mws\\default.aspx.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}",
+      "RelativeMoniker": "D:0:0:{2E0686ED-645B-4DE7-B91E-9A25BFBFAC29}|E:\\Magang\\PK GS\\MWS Mold External\\gsm_mws\\gsm_mws|solutionrelative:default.aspx.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{2E0686ED-645B-4DE7-B91E-9A25BFBFAC29}|E:\\Magang\\PK GS\\MWS Mold External\\gsm_mws\\gsm_mws|e:\\magang\\pk gs\\mws mold external\\gsm_mws\\gsm_mws\\mastermold.aspx||{57312C73-6202-49E9-B1E1-40EA1A6DC1F6}",
+      "RelativeMoniker": "D:0:0:{2E0686ED-645B-4DE7-B91E-9A25BFBFAC29}|E:\\Magang\\PK GS\\MWS Mold External\\gsm_mws\\gsm_mws|solutionrelative:mastermold.aspx||{57312C73-6202-49E9-B1E1-40EA1A6DC1F6}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{2E0686ED-645B-4DE7-B91E-9A25BFBFAC29}|E:\\Magang\\PK GS\\MWS Mold External\\gsm_mws\\gsm_mws|e:\\magang\\pk gs\\mws mold external\\gsm_mws\\gsm_mws\\viewworkorder.aspx||{57312C73-6202-49E9-B1E1-40EA1A6DC1F6}",
+      "RelativeMoniker": "D:0:0:{2E0686ED-645B-4DE7-B91E-9A25BFBFAC29}|E:\\Magang\\PK GS\\MWS Mold External\\gsm_mws\\gsm_mws|solutionrelative:viewworkorder.aspx||{57312C73-6202-49E9-B1E1-40EA1A6DC1F6}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{2E0686ED-645B-4DE7-B91E-9A25BFBFAC29}|E:\\Magang\\PK GS\\MWS Mold External\\gsm_mws\\gsm_mws|e:\\magang\\pk gs\\mws mold external\\gsm_mws\\gsm_mws\\viewworkorder.aspx.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}",
+      "RelativeMoniker": "D:0:0:{2E0686ED-645B-4DE7-B91E-9A25BFBFAC29}|E:\\Magang\\PK GS\\MWS Mold External\\gsm_mws\\gsm_mws|solutionrelative:viewworkorder.aspx.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{2E0686ED-645B-4DE7-B91E-9A25BFBFAC29}|E:\\Magang\\PK GS\\MWS Mold External\\gsm_mws\\gsm_mws|e:\\magang\\pk gs\\mws mold external\\gsm_mws\\gsm_mws\\mastermold.aspx.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}",
+      "RelativeMoniker": "D:0:0:{2E0686ED-645B-4DE7-B91E-9A25BFBFAC29}|E:\\Magang\\PK GS\\MWS Mold External\\gsm_mws\\gsm_mws|solutionrelative:mastermold.aspx.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 13,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{3ae79031-e1bc-11d0-8f78-00a0c9110057}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:773994213:0:{83107a3e-496a-485e-b455-16ddb978e55e}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:128:0:{116d2292-e37d-41cd-a077-ebacac4c8cc4}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:129:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{e506b91c-c606-466a-90a9-123d1d1e12b3}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:1:0:{d212f56b-c48a-434c-a121-1c5d80b59b9f}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{cce594b6-0c39-4442-ba28-10c64ac7e89f}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{1c4feeaa-4718-4aa9-859d-94ce25d182ba}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{74946827-37a0-11d2-a273-00c04f8ef4ff}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{fbcae063-e2c0-4ab1-a516-996ea3dafb72}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{0ad07096-bba9-4900-a651-0598d26f6d24}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{1c64b9c2-e352-428e-a56d-0ace190b99a6}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "Default.aspx.vb",
+              "DocumentMoniker": "E:\\Magang\\PK GS\\MWS Mold External\\gsm_mws\\gsm_mws\\Default.aspx.vb",
+              "RelativeDocumentMoniker": "Default.aspx.vb",
+              "ToolTip": "E:\\Magang\\PK GS\\MWS Mold External\\gsm_mws\\gsm_mws\\Default.aspx.vb",
+              "RelativeToolTip": "Default.aspx.vb",
+              "ViewState": "AQIAAF0AAAAAAAAAAAAYwGwAAAAtAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003361|",
+              "WhenOpened": "2025-03-03T04:48:15.502Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "AddWorkOrder.aspx",
+              "DocumentMoniker": "E:\\Magang\\PK GS\\MWS Mold External\\gsm_mws\\gsm_mws\\AddWorkOrder.aspx",
+              "RelativeDocumentMoniker": "AddWorkOrder.aspx",
+              "ToolTip": "E:\\Magang\\PK GS\\MWS Mold External\\gsm_mws\\gsm_mws\\AddWorkOrder.aspx",
+              "RelativeToolTip": "AddWorkOrder.aspx",
+              "LogicalView": "7651a703-06e5-11d1-8ebd-00a0c90f26ea",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000195|",
+              "WhenOpened": "2025-03-03T04:19:01.537Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "MasterMold.aspx",
+              "DocumentMoniker": "E:\\Magang\\PK GS\\MWS Mold External\\gsm_mws\\gsm_mws\\MasterMold.aspx",
+              "RelativeDocumentMoniker": "MasterMold.aspx",
+              "ToolTip": "E:\\Magang\\PK GS\\MWS Mold External\\gsm_mws\\gsm_mws\\MasterMold.aspx",
+              "RelativeToolTip": "MasterMold.aspx",
+              "LogicalView": "7651a703-06e5-11d1-8ebd-00a0c90f26ea",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000195|",
+              "WhenOpened": "2025-03-03T00:34:45.154Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "MasterMold.aspx.vb",
+              "DocumentMoniker": "E:\\Magang\\PK GS\\MWS Mold External\\gsm_mws\\gsm_mws\\MasterMold.aspx.vb",
+              "RelativeDocumentMoniker": "MasterMold.aspx.vb",
+              "ToolTip": "E:\\Magang\\PK GS\\MWS Mold External\\gsm_mws\\gsm_mws\\MasterMold.aspx.vb",
+              "RelativeToolTip": "MasterMold.aspx.vb",
+              "ViewState": "AQIAABYAAAAAAAAAAAAQwIcAAABJAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003361|",
+              "WhenOpened": "2025-03-03T00:34:45.265Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "ViewWorkOrder.aspx.vb",
+              "DocumentMoniker": "E:\\Magang\\PK GS\\MWS Mold External\\gsm_mws\\gsm_mws\\ViewWorkOrder.aspx.vb",
+              "RelativeDocumentMoniker": "ViewWorkOrder.aspx.vb",
+              "ToolTip": "E:\\Magang\\PK GS\\MWS Mold External\\gsm_mws\\gsm_mws\\ViewWorkOrder.aspx.vb",
+              "RelativeToolTip": "ViewWorkOrder.aspx.vb",
+              "ViewState": "AQIAAGUAAAAAAAAAAAAAAHsAAAAyAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003361|",
+              "WhenOpened": "2025-03-03T00:29:19.934Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "ViewWorkOrder.aspx",
+              "DocumentMoniker": "E:\\Magang\\PK GS\\MWS Mold External\\gsm_mws\\gsm_mws\\ViewWorkOrder.aspx",
+              "RelativeDocumentMoniker": "ViewWorkOrder.aspx",
+              "ToolTip": "E:\\Magang\\PK GS\\MWS Mold External\\gsm_mws\\gsm_mws\\ViewWorkOrder.aspx",
+              "RelativeToolTip": "ViewWorkOrder.aspx",
+              "LogicalView": "7651a703-06e5-11d1-8ebd-00a0c90f26ea",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000195|",
+              "WhenOpened": "2025-03-03T00:04:15.315Z",
+              "EditorCaption": ""
+            }
+          ]
+        },
+        {
+          "DockedWidth": 900,
+          "SelectedChildIndex": -1,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{004be353-6879-467c-9d1e-9ac23cdf6d49}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{34e76e81-ee4a-11d0-ae2e-00a0c90fffc3}"
+            }
+          ]
+        },
+        {
+          "DockedWidth": 1268,
+          "SelectedChildIndex": -1,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{d78612c7-9962-4b83-95d9-268046dad23a}"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
