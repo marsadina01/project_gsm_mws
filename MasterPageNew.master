@@ -1,0 +1,151 @@
+﻿<%@ Master Language="VB" CodeFile="MasterPageNew.master.vb" Inherits="MasterPageNew" %>
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head runat="server">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+        <title>GSM Portal | Supplier</title>
+        <link rel="icon" href="Images/logo2.png" type="image/x-icon" />
+
+        <style type="text/css">
+            @font-face {
+	            font-family: Rubik-Light;
+	            src: url('fonts/Rubik-Light.ttf');
+            }
+            @font-face {
+	            font-family: Rubik-Regular;
+	            src: url('fonts/Rubik-Regular.ttf');
+            }
+            @font-face {
+	            font-family: Rubik-Medium;
+	            src: url('fonts/Rubik-Medium.ttf');
+            }
+            @font-face {
+	            font-family: Rubik-Bold;
+	            src: url('fonts/Rubik-Bold.ttf');
+            }
+            @font-face {
+	            font-family: Poppins-Regular;
+	            src: url('fonts/Poppins-Regular.ttf');
+            }
+            body {
+                font-family: Rubik-Light;
+            }
+        </style>
+
+        <asp:ContentPlaceHolder id="head" runat="server"></asp:ContentPlaceHolder>
+    </head>
+
+    <body class="skin-purple sidebar-mini" style="font-family:Rubik-Regular;">
+        <div class="wrapper">
+            <header class="main-header">
+                <a href="home.aspx" class="logo" style="font-family:Rubik-Regular;">
+                    <span class="logo-mini"><b>GSM</b></span>
+                    <span class="logo-lg"><b>GS Supplier Management</b></span>
+                </a>
+
+                <nav class="navbar navbar-static-top">
+                    <a href="#" class="sidebar-toggle" data-toggle="push-menu" role="button">
+                        <span class="sr-only">Toggle navigation</span>
+                    </a>
+
+                    <div class="navbar-custom-menu">
+                        <ul class="nav navbar-nav">
+                            <li class="dropdown user user-menu">
+                                <a href="home.aspx" class="dropdown-toggle" data-toggle="dropdown">
+                                    <img id="img2" runat="server" class="user-image" alt="User Image" />
+                                    <span class="hidden-xs"><asp:Label runat="server" Text="User" ID="user"></asp:Label></span>
+                                </a>
+                                <ul class="dropdown-menu">
+                                    <li class="user-header">
+                                        <img id="img1" runat="server" class="img-circle" alt="User Image"/>
+                                        <p>
+                                            <asp:Label runat="server" ID="user1"></asp:Label>
+                                            <small><asp:Label runat="server" ID="role"></asp:Label></small>
+                                        </p>
+                                    </li>
+
+                                    <li class="user-footer">
+                                        <div class="pull-left">
+                                            <a id="A2" href="#" class="btn btn-default" runat="server" onserverclick="changepas_click">Ganti Password</a>
+                                        </div>
+                                        <div class="pull-right">
+                                            <a id="A1" href="#" class="btn btn-default" runat="server" onserverclick="logout_click">Keluar</a>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+                </nav>
+            </header> 
+
+            <aside class="main-sidebar">
+                <section class="sidebar">
+                    <div class="user-panel" style="font-family:Rubik-Regular;">
+                        <div class="pull-left image">
+                            <img src="dist/img/logo3.png" class="img-circle" alt="User Image">
+                        </div>
+                        <div class="pull-left info">
+                            <p><asp:Label ID="lbljudul" runat="server"></asp:Label></p>
+                            <a href="#"><i class="fa fa-circle text-success"></i> Online</a>
+                        </div>
+                    </div>
+                    <ul class="sidebar-menu" data-widget="tree" style="font-family:Rubik-Regular;">
+                        <li class="header">MAIN NAVIGATION</li>
+                        <li id="li_beranda" runat="server"><a href="Home.aspx" title="Dashboard"><i class="fa fa-home"></i><span> GSM Dashboard</span></a></li>
+                        <li class="treeview"><a href="Home.aspx"><i class="fa fa-cogs"></i> <span>Master</span><span class="pull-right-container"><i class="fa fa-angle-left pull-right"></i></span></a>
+                            <ul class="treeview-menu">
+                                <li><a href="MasterMachine.aspx"><i class="fa fa-wrench"></i> Master Machine</a></li>
+                                <li><a href="MasterMold.aspx"><i class="fa fa-cube"></i> Master Mold</a></li>
+                            </ul>
+                        </li>
+                        <li><a id="A3" href="#" runat="server" onserverclick="logout_click" title="Keluar"><i class="fa fa-power-off"></i><span> Keluar</span></a></li>
+                    </ul>
+                </section>
+            </aside>
+          
+            
+            <form id="form1" runat="server">
+                <div>
+                    <asp:ContentPlaceHolder id="ContentPlaceHolder1" runat="server"></asp:ContentPlaceHolder>
+                </div>
+            </form>
+
+            <footer class="main-footer">
+                <div class="pull-right hidden-xs">
+                  <b>Version</b> 1.0
+                </div>
+                <strong>Copyright &copy; 2021 <a href="www.gs.astra.co.id" style="color:#605ca8">PT GS BATTERY</a>.</strong> All rights
+                reserved.
+            </footer>
+        </div>
+
+        <script type="text/javascript" src="js/jqueryv.js"></script>
+    </body>
+
+    <script type="text/javascript">
+    $(document).ready(function () {
+        if (!$('body').hasClass('sidebar-collapse')) {
+            localStorage.setItem('sidebarState', 'open');
+        }
+
+        // Cek status sidebar dari localStorage
+        if (localStorage.getItem('sidebarState') === 'closed') {
+            $('body').addClass('sidebar-collapse');
+        }
+
+        // Toggle sidebar, simpan statusnya
+        $('.sidebar-toggle').click(function () {
+            if ($('body').hasClass('sidebar-collapse')) {
+                localStorage.setItem('sidebarState', 'closed');
+            } else {
+                localStorage.setItem('sidebarState', 'open');
+            }
+        });
+    });
+</script>
+</html>
+
