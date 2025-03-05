@@ -3,10 +3,6 @@
   "WorkspaceRootPath": "E:\\Magang\\PK GS\\MWS Mold External\\gsm_mws\\gsm_mws\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{2E0686ED-645B-4DE7-B91E-9A25BFBFAC29}|E:\\Magang\\PK GS\\MWS Mold External\\gsm_mws\\gsm_mws|e:\\magang\\pk gs\\mws mold external\\gsm_mws\\gsm_mws\\addworkorder.aspx||{57312C73-6202-49E9-B1E1-40EA1A6DC1F6}",
-      "RelativeMoniker": "D:0:0:{2E0686ED-645B-4DE7-B91E-9A25BFBFAC29}|E:\\Magang\\PK GS\\MWS Mold External\\gsm_mws\\gsm_mws|solutionrelative:addworkorder.aspx||{57312C73-6202-49E9-B1E1-40EA1A6DC1F6}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{2E0686ED-645B-4DE7-B91E-9A25BFBFAC29}|E:\\Magang\\PK GS\\MWS Mold External\\gsm_mws\\gsm_mws|e:\\magang\\pk gs\\mws mold external\\gsm_mws\\gsm_mws\\default.aspx.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}",
       "RelativeMoniker": "D:0:0:{2E0686ED-645B-4DE7-B91E-9A25BFBFAC29}|E:\\Magang\\PK GS\\MWS Mold External\\gsm_mws\\gsm_mws|solutionrelative:default.aspx.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}"
     },
@@ -34,7 +30,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 13,
+          "SelectedChildIndex": 12,
           "Children": [
             {
               "$type": "Bookmark",
@@ -86,33 +82,20 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 0,
               "Title": "Default.aspx.vb",
               "DocumentMoniker": "E:\\Magang\\PK GS\\MWS Mold External\\gsm_mws\\gsm_mws\\Default.aspx.vb",
               "RelativeDocumentMoniker": "Default.aspx.vb",
               "ToolTip": "E:\\Magang\\PK GS\\MWS Mold External\\gsm_mws\\gsm_mws\\Default.aspx.vb",
               "RelativeToolTip": "Default.aspx.vb",
-              "ViewState": "AQIAAF0AAAAAAAAAAAAYwGwAAAAtAAAA",
+              "ViewState": "AQIAAFEAAAAAAAAAAAAYwGAAAABVAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003361|",
               "WhenOpened": "2025-03-03T04:48:15.502Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "AddWorkOrder.aspx",
-              "DocumentMoniker": "E:\\Magang\\PK GS\\MWS Mold External\\gsm_mws\\gsm_mws\\AddWorkOrder.aspx",
-              "RelativeDocumentMoniker": "AddWorkOrder.aspx",
-              "ToolTip": "E:\\Magang\\PK GS\\MWS Mold External\\gsm_mws\\gsm_mws\\AddWorkOrder.aspx",
-              "RelativeToolTip": "AddWorkOrder.aspx",
-              "LogicalView": "7651a703-06e5-11d1-8ebd-00a0c90f26ea",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000195|",
-              "WhenOpened": "2025-03-03T04:19:01.537Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 1,
               "Title": "MasterMold.aspx",
               "DocumentMoniker": "E:\\Magang\\PK GS\\MWS Mold External\\gsm_mws\\gsm_mws\\MasterMold.aspx",
               "RelativeDocumentMoniker": "MasterMold.aspx",
@@ -125,7 +108,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 5,
+              "DocumentIndex": 4,
               "Title": "MasterMold.aspx.vb",
               "DocumentMoniker": "E:\\Magang\\PK GS\\MWS Mold External\\gsm_mws\\gsm_mws\\MasterMold.aspx.vb",
               "RelativeDocumentMoniker": "MasterMold.aspx.vb",
@@ -138,7 +121,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 3,
               "Title": "ViewWorkOrder.aspx.vb",
               "DocumentMoniker": "E:\\Magang\\PK GS\\MWS Mold External\\gsm_mws\\gsm_mws\\ViewWorkOrder.aspx.vb",
               "RelativeDocumentMoniker": "ViewWorkOrder.aspx.vb",
@@ -151,7 +134,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 2,
               "Title": "ViewWorkOrder.aspx",
               "DocumentMoniker": "E:\\Magang\\PK GS\\MWS Mold External\\gsm_mws\\gsm_mws\\ViewWorkOrder.aspx",
               "RelativeDocumentMoniker": "ViewWorkOrder.aspx",

@@ -13,9 +13,7 @@ Partial Class ViewWorkOrder
         If Session("name") Is Nothing Then
             Response.Redirect("default.aspx")
         End If
-        'If Session("role") <> "admin" Then
-        '    Response.Redirect("login.aspx")
-        'End If
+
         If Not IsPostBack Then
             data()
         End If
@@ -35,39 +33,41 @@ Partial Class ViewWorkOrder
         Dim conn As New SqlConnection(connStr)
         conn.Open()
 
-        Dim MatSql As String = "SELECT " +
-                            "w.wor_no AS wor_no, " +
-                            "w.wor_supplier AS wor_supplier, " +
-                            "w.wor_damage AS wor_kerusakkan, " +
-                            "w.wor_mold_tool AS wor_no_mold, " +
-                            "w.wor_createdate AS wor_request_date, " +
-                            "d.dt_techresponsedate AS wor_response_date, " +
-                            "w.wor_repairby AS wor_repairby, " +
-                            "w.wor_finisheddate AS wor_finished_date, " +
-                            "w.wor_status AS wor_status " +
-                        "FROM db_purchasing.dbo.t_workorder w " +
-                        "LEFT JOIN db_purchasing.dbo.t_detailworkorder d " +
-                        "ON w.wor_no = d.dt_wor_no " +
-                        "WHERE 1=1 "
+        ' Perbaikan sintaks SQL (DESC harus setelah ORDER BY)
+        Dim MatSql As String = "SELECT  " +
+                               " wor_no," +
+                               " wor_supplier," +
+                               " wor_damage," +
+                               " wor_mold_tool," +
+                               " wor_createdate," +
+                               " wor_responsedate," +
+                               " wor_repairby," +
+                               " wor_finisheddate," +
+                               " wor_status " +
+                            " FROM db_purchasing.dbo.t_workorder " +
+                            " WHERE 1 = 1" ' Pindahkan DESC ke ORDER BY nanti
 
         ' Tambahkan parameter jika user melakukan filter
         If ddlBreakdown IsNot Nothing AndAlso ddlBreakdown.SelectedValue <> "0" Then
-            MatSql += " AND w.wor_no LIKE @Breakdown"
+            MatSql += " AND wor_no LIKE @Breakdown"
             MatComm.Parameters.AddWithValue("@Breakdown", "%" & ddlBreakdown.SelectedValue & "%")
         End If
 
         If ddlStatus IsNot Nothing AndAlso Not String.IsNullOrEmpty(ddlStatus.SelectedValue) Then
-            MatSql += " AND w.wor_status = @Status"
+            MatSql += " AND wor_status = @Status"
             MatComm.Parameters.AddWithValue("@Status", ddlStatus.SelectedValue)
         End If
 
         If txtReqDate IsNot Nothing AndAlso Not String.IsNullOrEmpty(txtReqDate.Text) Then
             Dim requestDate As DateTime
             If DateTime.TryParse(txtReqDate.Text, requestDate) Then
-                MatSql += " AND CAST(w.wor_createdate AS DATE) = @ReqDate"
+                MatSql += " AND CAST(wor_createdate AS DATE) = @ReqDate"
                 MatComm.Parameters.AddWithValue("@ReqDate", requestDate.ToString("yyyy-MM-dd"))
             End If
         End If
+
+        ' ORDER BY harus di akhir, dan DESC setelahnya
+        MatSql += " ORDER BY wor_createdate DESC"
 
         MatComm.Connection = conn
         MatComm.CommandText = MatSql
@@ -78,7 +78,6 @@ Partial Class ViewWorkOrder
         If dtab.Rows.Count > 0 Then
             rptWorkOrder.DataSource = dv
             Me.rptWorkOrder.DataBind()
-            'gvdata.DataBind()
         Else
             rptWorkOrder.DataSource = Me.Get_EmptyDataTable()
             rptWorkOrder.DataBind()
@@ -112,12 +111,12 @@ Partial Class ViewWorkOrder
         ' Tambahkan semua kolom yang ada di GridView
         dtEmpty.Columns.Add("wor_no", GetType(String))
         dtEmpty.Columns.Add("wor_supplier", GetType(String))
-        dtEmpty.Columns.Add("wor_kerusakkan", GetType(String))
-        dtEmpty.Columns.Add("wor_no_mold", GetType(String))
-        dtEmpty.Columns.Add("wor_request_date", GetType(String))
-        dtEmpty.Columns.Add("wor_response_date", GetType(String))
+        dtEmpty.Columns.Add("wor_damage", GetType(String))
+        dtEmpty.Columns.Add("wor_mold_tool", GetType(String))
+        dtEmpty.Columns.Add("wor_createdate", GetType(String))
+        dtEmpty.Columns.Add("wor_responsedate", GetType(String))
         dtEmpty.Columns.Add("wor_repairby", GetType(String))
-        dtEmpty.Columns.Add("wor_finished_date", GetType(String))
+        dtEmpty.Columns.Add("wor_finisheddate", GetType(String))
         dtEmpty.Columns.Add("wor_status", GetType(String))
 
         ' Buat baris kosong

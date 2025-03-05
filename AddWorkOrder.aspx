@@ -20,7 +20,114 @@
                 }
             });
         });
+
+        function setActive(button) {
+            // Ambil semua tombol dengan class 'custom-dark-btn'
+            var buttons = document.querySelectorAll(".custom-dark-btn");
+
+            // Hapus class 'active-btn' dari semua tombol
+            buttons.forEach(btn => btn.classList.removeClass("active-btn"));
+
+            // Tambahkan class 'active-btn' ke tombol yang diklik
+            button.classList.addClass("active-btn");
+        }
+
+        function toggleUploadBox() {
+            var uploadBox = document.getElementById("uploadBox");
+            uploadBox.style.display = (uploadBox.style.display === "none" || uploadBox.style.display === "") ? "block" : "none";
+        }
+
+        // Drag & Drop Event
+        document.getElementById("uploadArea").addEventListener("dragover", function (e) {
+            e.preventDefault();
+            this.style.background = "#e9ecef";
+        });
+
+        document.getElementById("uploadArea").addEventListener("dragleave", function (e) {
+            this.style.background = "#fff";
+        });
+
+        document.getElementById("uploadArea").addEventListener("drop", function (e) {
+            e.preventDefault();
+            this.style.background = "#fff";
+            alert("File siap diunggah!");
+        });
+
+        document.getElementById("fileInput").addEventListener("change", function () {
+            alert("File dipilih: " + this.files[0].name);
+        });
+
     </script>
+
+    <style>
+
+        .custom-dark-btn {
+            background-color: #343a40; /* Warna dasar dark */
+            color: #fff;
+            border: 1px solid #1d2124;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-weight: bold;
+            transition: all 0.3s ease-in-out;
+            cursor: pointer;
+        }
+
+        /* Warna hijau saat hover */
+        .custom-dark-btn:hover {
+            background-color: #28a745;
+            border-color: #218838;
+        }
+
+        /* Warna tetap hijau setelah diklik */
+        .custom-dark-btn.active-btn {
+            background-color: #218838 !important;
+            border-color: #1e7e34 !important;
+            color: #fff !important;
+        }
+
+        .left, .right {
+            flex: 1; /* Menyebarkan ruang antara elemen */
+        }
+
+        .left {
+            text-align: left;
+        }
+
+        .right {
+            text-align: right;
+        }
+
+        .btn-custom {
+            display: inline-block; /* Memastikan keduanya memiliki properti display yang sama */
+            padding: 10px 20px; /* Samakan padding */
+            font-size: 16px; /* Samakan ukuran font */
+            height: 40px; /* Samakan tinggi */
+            line-height: 20px; /* Pastikan teks sejajar */
+            border-radius: 5px; /* Pastikan bentuk seragam */
+            vertical-align: middle;
+        }
+
+        .upload-area {
+            border: 2px dashed #007bff;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+        }
+
+        .upload-area:hover {
+            background: #f1f1f1;
+        }
+
+        .upload-icon {
+            display: inline-block;
+            padding: 10px;
+            color: #007bff;
+            font-size: 18px;
+            cursor: pointer;
+        }
+
+    </style>
+
 </asp:Content>
 
 <asp:Content ID="Content2" ContentPlaceHolderID="ContentPlaceHolder1" Runat="Server">
@@ -30,59 +137,96 @@
                 <b>Add Work Order Request External</b>
             </h1>
             <ol class="breadcrumb">
-              <li><a href="ViewWorkOrder.aspx"><i class="fa fa-folder-open"></i> WOR</a></li>
-              <li>Add New</li>
+                <li><a href="ViewWorkOrder.aspx"><i class="fa fa-folder-open"></i> WOR</a></li>
+                <li>Add New</li>
             </ol>
         </section>
         
         <section class="content">
-             <div class="row">
-                 <div class="col-xs-12">
-                     <div class="box">
-                         <div class="box-body">
-                            
+            <div class="box">
+                <div class="box-body">
+                    <div class="form-group row">
+                        <label class="col-sm-3 col-form-label">Requestor <span style="color: red">*</span></label>
+                        <div class="col-sm-9">
+                            <asp:Label visible="false" ID="lblidreq" runat="server" />
+                            <asp:TextBox ID="txtrequestor" runat="server" class="form-control" disabled></asp:TextBox>
                         </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-sm-3 col-form-label">Machine <span style="color: red">*</span></label>
+                        <div class="col-sm-9">   
+                            <asp:DropDownList id="ddlmachine" Runat="server" class="form-control" required="true">
+                                <asp:ListItem Text="-- Pilih No Machine --" Value="" Selected="True" Disabled="True"></asp:ListItem>
+                                <asp:ListItem Text="Machine 1" Value="1"></asp:ListItem>
+                                <asp:ListItem Text="Machine 2" Value="2"></asp:ListItem>
+                            </asp:DropDownList>
+                        </div>
+                    </div>
+                    <div class="form-group d-flex justify-content-center w-100 mt-3">
+                        <div class="text-center">
+                            <asp:LinkButton ID="btnMold" runat="server" class="btn custom-dark-btn mx-2" 
+                                Text="Mold" OnClientClick="setActive(this)" OnClick="btnMold_Click" />
+                            <asp:LinkButton ID="btnTool" runat="server" class="btn custom-dark-btn mx-2" 
+                                Text="Tooling" OnClientClick="setActive(this)" OnClick="btnTool_Click" />
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-sm-3 col-form-label">Mold / Tooling <span style="color: red">*</span></label>
+                        <div class="col-sm-9">
+                            <asp:DropDownList ID="ddlMoldTool" runat="server" class="form-control" AppendDataBoundItems="true" required="true">
+                                <asp:ListItem Text="-- Pilih ID Mold / Tool --" Value="" Selected="True" Disabled="True"></asp:ListItem>
+                            </asp:DropDownList>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-sm-3 col-form-label">Gejala Kerusakkan <span style="color: red">*</span></label>
+                        <div class="col-sm-9">
+                            <asp:TextBox ID="txtkerusakan" runat="server" class="form-control" placeholder="Gejala Kerusakan"></asp:TextBox>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-sm-3 col-form-label">Additional Note</label>
+                        <div class="col-sm-9">
+                            <asp:TextBox ID="txtketerangan" runat="server" class="form-control" placeholder="Keterangan Tambahan"></asp:TextBox>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <asp:CheckBox ID="chkKirimGS" runat="server" /> Kirim GS untuk Memperbaiki Mold/Tooling
+                    </div>
+                    
+                    <table class="table table-bordered">
+                        <tr><th>Jumlah Stok</th><td>672</td></tr>
+                        <tr><th>Total Order</th><td>21772</td></tr>
+                        <tr><th>Tgl Produksi Dibutuhkan</th><td>20, 21, 22 Jan 2025</td></tr>
+                    </table>
+                </div>
+            </div>
+            <div class="box">
+                <div class="box-header">
+                    <div class="form-group">
+                        <asp:Button ID="btnLampiran" runat="server" class="btn btn-secondary" Text="Lampiran" OnClientClick="toggleUploadBox(); return false;" />
+                    </div>
+                </div>
 
-                         <div class="modal fade" id="modal-default">
-                           <div class="modal-dialog">
-                               <div class="modal-content">
-                                   <div class="modal-header">
-                                       <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                       <span aria-hidden="true">&times;</span></button>
-                                       <h4 class="modal-title">Add Mold / Tool</h4>
-                                   </div>
-                                   <div class="modal-body pad">
-                                       <div class="form-group">
-                                           <label>Nama Mold / Tool </label><label style="color: #FF0000"> *</label>
-                                           <asp:textbox id="txtname" Runat="server" class="form-control" required="true"></asp:textbox>
-                                       </div>
-                                       <div class="form-group">
-                                            <label>Tipe Mold / Tool </label><label style="color: #FF0000"> *</label>
-                                            <asp:DropDownList id="ddlType" Runat="server" class="form-control" required="true">
-                                                <asp:ListItem Text="-- Pilih Tipe --" Value="" Selected="True" Disabled="True"></asp:ListItem>
-                                                <asp:ListItem Text="Mold" Value="1"></asp:ListItem>
-                                                <asp:ListItem Text="Tool" Value="2"></asp:ListItem>
-                                            </asp:DropDownList>
-                                       </div>
-                                   </div>
-                                   <div class="modal-footer">
-                                       <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
-                                       <asp:button runat="server" ID="btnsave" Text="Save" class="btn btn-primary" OnClick="btnsave_Click" />
-                                   </div>
-                               </div>
-                           </div>
-                       </div>
-                       </div>
-           
-                        
-                     </div>
-                 </div>
-               <!-- ./col -->
-             </div>
+                <!-- Box Body (Awalnya Tersembunyi) -->
+                <div class="box-body" id="uploadBox" style="display: none;">
+                    <div class="upload-area" id="uploadArea">
+                        <p>Drag & Drop file di sini atau</p>
+                        <label for="fileInput" class="upload-icon">
+                            <i class="fa fa-upload"></i> Pilih File
+                        </label>
+                        <input type="file" id="fileInput" style="display: none;" />
+                    </div>
+                </div>
+            </div>
+            <div class="form-group d-flex justify-content-between align-items-center w-100">
+                <a type="button" class="btn btn-danger custom-btn" href="ViewWorkOrder.aspx">Cancel WO</a>
+                <asp:Button ID="btnSimpan" runat="server" class="btn btn-primary custom-btn" Text="Simpan" />
+            </div>
         </section>
     </div>
-    <script src="bower_components/jquery/dist/jquery.min.js"></script>
-    <!-- Bootstrap 3.3.7 -->
+
+    <!-- Bootstrap -->
     <script src="bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
     <!-- FastClick -->
     <script src="bower_components/fastclick/lib/fastclick.js"></script>
@@ -90,33 +234,6 @@
     <script src="dist/js/adminlte.min.js"></script>
     <!-- AdminLTE for demo purposes -->
     <script src="dist/js/demo.js"></script>
-    <script type="text/javascript" src="bower_components/select2/dist/js/select2.full.min.js"></script>
-    <script type="text/javascript">
-        $(function () {
-            $('.select2').select2()
+    <script src="bower_components/select2/dist/js/select2.full.min.js"></script>
 
-            $('#site').DataTable()
-            $('#template').DataTable({
-                'paging'      : true,
-                'lengthChange': false,
-                'searching'   : false,
-                'ordering'    : true,
-                'info'        : true,
-                'autoWidth'   : false
-            })
-        })
-
-        function OnEdit(sender) {
-            var row = sender.closest('tr');
-            document.getElementById(row.id + '_lblsite_nama').style.display = 'none';
-            document.getElementById(row.id + '_txtsite_nama').style.display = 'inline';
-            document.getElementById(row.id + '_lblsite_tipe').style.display = 'none';
-            document.getElementById(row.id + '_ddlsite_tipe').style.display = 'inline';
-            document.getElementById(row.id + '_lbubah').style.display = 'none';
-            document.getElementById(row.id + '_lbsimpan').style.display = 'inline';
-            document.getElementById(row.id + '_lbcancel').style.display = 'inline';
-        }
-    </script>
-   
 </asp:Content>
-

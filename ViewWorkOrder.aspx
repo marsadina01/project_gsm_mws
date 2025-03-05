@@ -146,9 +146,9 @@
                                 </div>
                             </div>
 
-                            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modal-default">
+                            <a type="button" class="btn btn-primary" href="AddWorkOrder.aspx">
                                 Add New
-                            </button>
+                            </a>
                         </div>
                         
                         <div class="box-body">
@@ -178,12 +178,12 @@
                                         <td><%# Container.ItemIndex + 1 %></td>
                                         <td><%# Eval("wor_no") %></td>
                                         <td><%# Eval("wor_supplier") %></td>
-                                        <td><%# Eval("wor_kerusakkan") %></td>
-                                        <td><%# Eval("wor_no_mold") %></td>
-                                        <td><%# Eval("wor_request_date", "{0:dd/MM/yyyy HH:mm}") %></td>
-                                        <td><%# Eval("wor_response_date", "{0:dd/MM/yyyy HH:mm}") %></td>
+                                        <td><%# Eval("wor_damage") %></td>
+                                        <td><%# Eval("wor_mold_tool") %></td>
+                                        <td><%# Eval("wor_createdate", "{0:dd/MM/yyyy HH:mm}") %></td>
+                                        <td><%# Eval("wor_responsedate", "{0:dd/MM/yyyy HH:mm}") %></td>
                                         <td><%# Eval("wor_repairby") %></td>
-                                        <td><%# Eval("wor_finished_date", "{0:dd/MM/yyyy HH:mm}") %></td>
+                                        <td><%# Eval("wor_finisheddate", "{0:dd/MM/yyyy HH:mm}") %></td>
                                         <td style='<%# GetStatusStyle(Eval("wor_status")) %>'>
                                             <%# GetStatusText(Eval("wor_status")) %>
                                         </td>
