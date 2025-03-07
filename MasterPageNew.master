@@ -96,7 +96,7 @@
                     <ul class="sidebar-menu" data-widget="tree" style="font-family:Rubik-Regular;">
                         <li class="header">MAIN NAVIGATION</li>
                         <li id="li_beranda" runat="server"><a href="Home.aspx" title="Dashboard"><i class="fa fa-home"></i><span> GSM Dashboard</span></a></li>
-                        <li class="treeview"><a href="Home.aspx"><i class="fa fa-cogs"></i> <span>Master</span><span class="pull-right-container"><i class="fa fa-angle-left pull-right"></i></span></a>
+                        <li class="treeview" id="li_master" runat="server"><a href="Home.aspx"><i class="fa fa-cogs"></i> <span>Master</span><span class="pull-right-container"><i class="fa fa-angle-left pull-right"></i></span></a>
                             <ul class="treeview-menu">
                                 <li><a href="MasterMachine.aspx"><i class="fa fa-wrench"></i> Master Machine</a></li>
                                 <li><a href="MasterMold.aspx"><i class="fa fa-cube"></i> Master Mold</a></li>

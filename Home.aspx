@@ -186,7 +186,7 @@
                         <div class="small-box bg-red">
                             <div class="inner">
                                 <h3 style="color:white;font-family:Rubik-Regular;">MWS</h3>
-                                <p style="color:white;">Mold an Toold</p>
+                                <p style="color:white;">Mold an Tool</p>
                             </div>
                         
                             <div class="icon" style="padding-top:15px;">

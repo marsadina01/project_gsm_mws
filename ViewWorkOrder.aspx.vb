@@ -34,18 +34,36 @@ Partial Class ViewWorkOrder
         conn.Open()
 
         ' Perbaikan sintaks SQL (DESC harus setelah ORDER BY)
-        Dim MatSql As String = "SELECT  " +
-                               " wor_no," +
-                               " wor_supplier," +
-                               " wor_damage," +
-                               " wor_mold_tool," +
-                               " wor_createdate," +
-                               " wor_responsedate," +
-                               " wor_repairby," +
-                               " wor_finisheddate," +
-                               " wor_status " +
-                            " FROM db_purchasing.dbo.t_workorder " +
-                            " WHERE 1 = 1" ' Pindahkan DESC ke ORDER BY nanti
+        Dim MatSql As String = "SELECT " +
+                                    " w.wor_no," +
+                                    " s.spl_nama As wor_supplier," +
+                                    " w.wor_damage," +
+                                    " m.mold_nama As wor_mold_tool," +
+                                    " w.wor_createdate," +
+                                    " w.wor_responsedate," +
+                                    " w.wor_repairby," +
+                                    " w.wor_finisheddate," +
+                                    " w.wor_status  " +
+                                 "From db_purchasing.dbo.t_workorder w " +
+                                    "INNER Join db_purchasing.dbo.tlkp_supplier s ON w.wor_supplier = s.spl_id " +
+                                    "INNER Join db_purchasing.dbo.tlkp_mold m ON w.wor_mold_tool = m.mold_id " +
+                                 "WHERE 1 = 1 "
+
+        ' Tambahkan filter berdasarkan Session("namainfor") jika ada
+        If Session("nameinfor") IsNot Nothing AndAlso Not String.IsNullOrEmpty(Session("nameinfor").ToString()) Then
+            MatSql += " AND w.wor_supplier = @NamaInfor"
+            MatComm.Parameters.AddWithValue("@NamaInfor", Session("nameinfor").ToString())
+        End If
+
+        If Session("role") = "teknisiSup" Then
+            MatSql += " AND w.wor_repairby = 'Supplier' AND w.wor_status <> 1 AND w.wor_status <> 0"
+        ElseIf Session("role") = "teknisiGS" Then
+            MatSql += " AND w.wor_repairby = 'GS' AND w.wor_status <> 1"
+        ElseIf Session("role") = "atstekSup" Then
+            MatSql += " AND w.wor_repairby = 'Supplier' AND w.wor_status <> 1 AND w.wor_status <> 2 AND w.wor_status <> 3 AND w.wor_status <> 0"
+        ElseIf Session("role") = "atstekGS" Then
+            MatSql += " AND w.wor_repairby = 'GS' AND w.wor_status <> 1 AND w.wor_status <> 2 AND w.wor_status <> 3 AND w.wor_status <> 0"
+        End If
 
         ' Tambahkan parameter jika user melakukan filter
         If ddlBreakdown IsNot Nothing AndAlso ddlBreakdown.SelectedValue <> "0" Then

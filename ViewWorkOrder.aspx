@@ -188,7 +188,7 @@
                                             <%# GetStatusText(Eval("wor_status")) %>
                                         </td>
                                         <td>
-                                            <%# If(Eval("wor_no").ToString() <> "No data available in table", "<button class='btn btn-info btn-sm'>Detail</button>", "") %>
+                                            <%# If(Eval("wor_no").ToString() <> "No data available in table", "<button class='btn btn-info btn-sm'><i class='fa fa-eye'></i></button>", "") %>
                                         </td>
                                     </tr>
                                 </ItemTemplate>

@@ -100,7 +100,7 @@ Partial Class _Default
 
                             ' Handle roles using Select Case
                             Select Case userRow("user_role").ToString().ToLower()
-                                Case "admin", "mpc", "purchasing", "qc", "eng", "mws", "she", "superadmin", "vendor", "fin"
+                                Case "admin", "superadmin", "requester", "atsreq", "teknisisup", "teknisigs", "atsteksup", "atstekgs"
                                     Session("role") = userRow("user_role").ToString()
 
                                     'If userRow("user_status_otp") = 1 Then

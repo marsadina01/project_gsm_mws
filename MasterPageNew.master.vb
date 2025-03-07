@@ -75,6 +75,15 @@ Partial Class MasterPageNew
         '        Exit Select
         'End Select
 
+        If Session("role") = "requester" Or
+           Session("role") = "atsreq" Or
+           Session("role") = "teknisiGS" Or
+           Session("role") = "atstekGS" Or
+           Session("role") = "teknisiSup" Or
+           Session("role") = "atstekSup" Then
+
+            li_master.Visible = False
+        End If
 
 
 
@@ -84,6 +93,18 @@ Partial Class MasterPageNew
             user1.Text = Session("namafull").ToString
             role.Text = Session("role").ToString
             lbljudul.Text = Session("name").ToString
+
+            If Session("role") = "atsreq" Then
+                role.Text = "Atasan Requester"
+            ElseIf Session("role") = "teknisiSup" Then
+                role.Text = "Teknisi Supplier"
+            ElseIf Session("role") = "teknisiGS" Then
+                role.Text = "Teknisi GS"
+            ElseIf Session("role") = "atstekSup" Then
+                role.Text = "Atasan Teknisi Supplier"
+            ElseIf Session("role") = "atstekGS" Then
+                role.Text = "Atasan Teknisi GS"
+            End If
 
             If Session("foto") = "" Then
                 img1.Src = "dist/img/avatar.png"
