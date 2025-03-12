@@ -18,11 +18,6 @@ Partial Class AddWorkOrder
         If Not IsPostBack Then
             txtrequestor.Text = Session("namafull").ToString()
             ViewState("namafull") = txtrequestor.Text
-        Else
-            ' Ambil kembali dari ViewState saat postback
-            If ViewState("namafull") IsNot Nothing Then
-                txtrequestor.Text = ViewState("namafull").ToString()
-            End If
             lblidreq.Text = Session("npk").ToString()
             LoadMachines()
             'dataMoldTool("")
