@@ -3,11 +3,14 @@ Imports System.Data
 Imports System
 Imports System.Security.Cryptography
 Imports System.Data.SqlClient
+Imports iTextSharp.text.pdf.AcroFields
+Imports System.Web.Services
 
 Partial Class ViewWorkOrder
     Inherits System.Web.UI.Page
 
-    Dim connStr As String = DecryptString(ConfigurationManager.ConnectionStrings("Conn").ToString())
+    ' Variabel connection string sebagai Shared
+    Private Shared ReadOnly connStr As String = DecryptString(ConfigurationManager.ConnectionStrings("Conn").ToString())
 
     Protected Sub Page_Load(ByVal sender As Object, ByVal e As EventArgs) Handles Me.Load
         If Session("name") Is Nothing Then
@@ -58,7 +61,7 @@ Partial Class ViewWorkOrder
         If Session("role") = "teknisiSup" Then
             MatSql += " AND w.wor_repairby = 'Supplier' AND w.wor_status <> 1 AND w.wor_status <> 0"
         ElseIf Session("role") = "teknisiGS" Then
-            MatSql += " AND w.wor_repairby = 'GS' AND w.wor_status <> 1"
+            MatSql += " AND w.wor_repairby = 'GS' AND w.wor_status <> 1 AND w.wor_status <> 0"
         ElseIf Session("role") = "atstekSup" Then
             MatSql += " AND w.wor_repairby = 'Supplier' AND w.wor_status <> 1 AND w.wor_status <> 2 AND w.wor_status <> 3 AND w.wor_status <> 0"
         ElseIf Session("role") = "atstekGS" Then
@@ -123,6 +126,54 @@ Partial Class ViewWorkOrder
         data(isReset)
     End Sub
 
+    <WebMethod()>
+    Public Shared Function OnResponse(ByVal worNo As String) As String
+        ' Cek apakah parameter kosong
+        If String.IsNullOrEmpty(worNo) Then
+            Return "Work Order tidak valid."
+        End If
+
+        Dim con As New SqlConnection(connStr)
+        Dim transaction As SqlTransaction = Nothing
+
+        Try
+            con.Open()
+            transaction = con.BeginTransaction()
+
+            ' Query 1: Update status di tabel t_workorder
+            Dim query1 As String = "UPDATE db_purchasing.dbo.t_workorder SET wor_status = 3, wor_responsedate = GETDATE() WHERE wor_no = @wor_no"
+
+            ' Query 2: Insert ke tabel t_detailworkorder
+            Dim query2 As String = "INSERT INTO db_purchasing.dbo.t_detailworkorder (dt_wor_no, dt_createby, dt_createdate, dt_level) VALUES (@wor_no, @npk, GETDATE(), 'Level 2')"
+
+            ' Eksekusi Query 1
+            Using cmd1 As New SqlCommand(query1, con, transaction)
+                cmd1.Parameters.AddWithValue("@wor_no", worNo)
+                cmd1.ExecuteNonQuery()
+            End Using
+
+            ' Eksekusi Query 2
+            Using cmd2 As New SqlCommand(query2, con, transaction)
+                cmd2.Parameters.AddWithValue("@wor_no", worNo)
+                cmd2.Parameters.AddWithValue("@npk", HttpContext.Current.Session("npk")) ' Ambil nilai NPK dari session
+                cmd2.ExecuteNonQuery()
+            End Using
+
+            ' Commit jika semua berhasil
+            transaction.Commit()
+            Return "WO telah direspons."
+        Catch ex As Exception
+            ' Rollback jika ada error
+            If transaction IsNot Nothing Then
+                transaction.Rollback()
+            End If
+            Return "Terjadi kesalahan: " & ex.Message
+        Finally
+            con.Close()
+        End Try
+    End Function
+
+
     Public Function Get_EmptyDataTable() As DataTable
         Dim dtEmpty As New DataTable()
 
@@ -147,6 +198,33 @@ Partial Class ViewWorkOrder
         dtEmpty.Rows.Add(datatRow)
 
         Return dtEmpty
+    End Function
+
+    Public Function GetActionButtons(ByVal worStatus As Object, ByVal worNo As Object) As String
+        ' Cek apakah worStatus atau worNo adalah NULL atau kosong sebelum digunakan
+        If worStatus Is DBNull.Value OrElse worNo Is DBNull.Value Then
+            Return "" ' Jika NULL, jangan tampilkan tombol
+        End If
+
+        Dim status As String = worStatus.ToString()
+        Dim workOrderNo As String = worNo.ToString()
+        Dim buttons As String = ""
+
+        ' Pastikan status adalah angka valid
+        If Not String.IsNullOrEmpty(status) AndAlso IsNumeric(status) Then
+            If status = "2" Then
+                buttons &= "<button type='button' class='btn btn-danger btn-sm' title='Response' style='margin-right: 5px;' onclick='respondToWorkOrder(""" & workOrderNo & """)'>"
+                buttons &= "<i class='fa fa-deafness'></i></button>"
+            End If
+        End If
+
+        ' Tampilkan tombol Detail jika workOrderNo tidak berisi "No data available in table"
+        If Not String.IsNullOrEmpty(workOrderNo) AndAlso workOrderNo <> "No data available in table" Then
+            buttons &= "<button type='button' class='btn btn-info btn-sm' title='Detail' style='margin-right: 5px;'>"
+            buttons &= "<i class='fa fa-eye'></i></button>"
+        End If
+
+        Return buttons
     End Function
 
     Public Function GetStatusText(ByVal statusID As Object) As String
