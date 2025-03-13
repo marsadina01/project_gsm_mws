@@ -26,10 +26,10 @@
             var buttons = document.querySelectorAll(".custom-dark-btn");
 
             // Hapus class 'active-btn' dari semua tombol
-            buttons.forEach(btn => btn.classList.removeClass("active-btn"));
+            buttons.forEach(btn => btn.classList.remove("active-btn"));
 
             // Tambahkan class 'active-btn' ke tombol yang diklik
-            button.classList.addClass("active-btn");
+            button.classList.add("active-btn");
         }
 
         function toggleUploadBox() {
@@ -57,10 +57,19 @@
             alert("File dipilih: " + this.files[0].name);
         });
 
+        function validateForm() {
+            var kerusakan = document.getElementById('<%= txtKerusakan.ClientID %>').value.trim();
+            if (kerusakan === "") {
+                alert("Gejala Kerusakan harus diisi!");
+                return false;
+            }
+            return true;
+        }
     </script>
 
     <style>
 
+        /* Warna default */
         .custom-dark-btn {
             background-color: #343a40; /* Warna dasar dark */
             color: #fff;
@@ -72,15 +81,9 @@
             cursor: pointer;
         }
 
-        /* Warna hijau saat hover */
-        .custom-dark-btn:hover {
-            background-color: #28a745;
-            border-color: #218838;
-        }
-
-        /* Warna tetap hijau setelah diklik */
+        /* Warna hijau saat aktif */
         .custom-dark-btn.active-btn {
-            background-color: #218838 !important;
+            background-color: #28a745 !important;
             border-color: #1e7e34 !important;
             color: #fff !important;
         }
@@ -125,7 +128,6 @@
             font-size: 18px;
             cursor: pointer;
         }
-
     </style>
 
 </asp:Content>
@@ -181,7 +183,9 @@
                     <div class="form-group row">
                         <label class="col-sm-3 col-form-label">Gejala Kerusakkan <span style="color: red">*</span></label>
                         <div class="col-sm-9">
-                            <asp:TextBox ID="txtkerusakan" runat="server" class="form-control" placeholder="Gejala Kerusakan"></asp:TextBox>
+                            <asp:TextBox ID="txtKerusakan" runat="server" CssClass="form-control" placeholder="Gejala Kerusakan"></asp:TextBox>
+                            <asp:CustomValidator ID="cvKerusakan" runat="server" ControlToValidate="txtKerusakan" ClientValidationFunction="validateKerusakan"
+                                ErrorMessage="Gejala Kerusakan harus diisi." Display="Dynamic" ForeColor="Red" />
                         </div>
                     </div>
                     <div class="form-group row">
@@ -195,9 +199,18 @@
                     </div>
                     
                     <table class="table table-bordered">
-                        <tr><th>Jumlah Stok</th><td>672</td></tr>
-                        <tr><th>Total Order</th><td>21772</td></tr>
-                        <tr><th>Tgl Produksi Dibutuhkan</th><td>20, 21, 22 Jan 2025</td></tr>
+                        <tr>
+                            <th>Jumlah Stok</th>
+                            <td><asp:TextBox ID="txtStok" runat="server" CssClass="form-control" TextMode="Number"></asp:TextBox></td>
+                        </tr>
+                        <tr>
+                            <th>Total Order</th>
+                            <td><asp:TextBox ID="txtTotalOrder" runat="server" CssClass="form-control" TextMode="Number"></asp:TextBox></td>
+                        </tr>
+                        <tr>
+                            <th>Tgl Produksi Dibutuhkan</th>
+                            <td><asp:TextBox ID="txtTglProduksi" runat="server" CssClass="form-control"></asp:TextBox></td>
+                        </tr>
                     </table>
                 </div>
             </div>
@@ -211,17 +224,20 @@
                 <!-- Box Body (Awalnya Tersembunyi) -->
                 <div class="box-body" id="uploadBox" style="display: none;">
                     <div class="upload-area" id="uploadArea">
-                        <p>Drag & Drop file di sini atau</p>
                         <label for="fileInput" class="upload-icon">
                             <i class="fa fa-upload"></i> Pilih File
                         </label>
                         <input type="file" id="fileInput" style="display: none;" />
+                        <asp:FileUpload ID="fuLampiran" runat="server" />
+                        <asp:Button ID="btnUpload" runat="server" Text="Upload File" OnClick="btnUpload_Click" CssClass="btn btn-primary" />
+                        <asp:Label ID="lblMessage" runat="server" ForeColor="Red"></asp:Label>
                     </div>
                 </div>
             </div>
             <div class="form-group d-flex justify-content-between align-items-center w-100">
                 <a type="button" class="btn btn-danger custom-btn" href="ViewWorkOrder.aspx">Cancel WO</a>
-                <asp:Button ID="btnSimpan" runat="server" class="btn btn-primary custom-btn" Text="Simpan" />
+                <asp:Button ID="btnSimpan" runat="server" CssClass="btn btn-primary custom-btn" Text="Simpan" OnClientClick="return validateForm();" OnClick="btnSave_Click" />
+
             </div>
         </section>
     </div>

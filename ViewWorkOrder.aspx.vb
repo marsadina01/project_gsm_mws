@@ -218,10 +218,9 @@ Partial Class ViewWorkOrder
             End If
         End If
 
-        ' Tampilkan tombol Detail jika workOrderNo tidak berisi "No data available in table"
         If Not String.IsNullOrEmpty(workOrderNo) AndAlso workOrderNo <> "No data available in table" Then
-            buttons &= "<button type='button' class='btn btn-info btn-sm' title='Detail' style='margin-right: 5px;'>"
-            buttons &= "<i class='fa fa-eye'></i></button>"
+            buttons &= "<a href='DetailWorkOrder.aspx?wor_no=" & workOrderNo & "' class='btn btn-info btn-sm' title='Detail' style='margin-right: 5px;'>"
+            buttons &= "<i class='fa fa-eye'></i> Detail</a>"
         End If
 
         Return buttons
