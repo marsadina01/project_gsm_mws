@@ -76,7 +76,7 @@ Partial Class DetailWorkOrder
             Exit Sub
         End If
 
-        Dim query As String = "SELECT u.spl_nama, w.wor_damage, w.wor_machine, w.wor_mold_tool, w.wor_repairby, w.wor_lampiran, w.wor_addnote, w.wor_status, w.wor_createby, w.wor_createdate FROM t_workorder w LEFT JOIN tlkp_supplier u ON w.wor_supplier = u.spl_id WHERE w.wor_no = @wor_no"
+        Dim query As String = "SELECT u.spl_nama, w.wor_damage, w.wor_machine, w.wor_mold_tool, w.wor_repairby, w.wor_lampiran, w.wor_addnote, w.wor_status, w.wor_createby, w.wor_createdate, w.wor_stok, w.wor_total_order, w.wor_tglproduksi FROM t_workorder w LEFT JOIN tlkp_supplier u ON w.wor_supplier = u.spl_id WHERE w.wor_no = @wor_no"
 
         Using conn As New SqlConnection(connStr)
             Using cmd As New SqlCommand(query, conn)
@@ -104,6 +104,9 @@ Partial Class DetailWorkOrder
 
                             'txtLampiran.Text = If(IsDBNull(reader("wor_lampiran")), "", reader("wor_lampiran").ToString())
                             txtketerangan.Text = If(IsDBNull(reader("wor_addnote")), "", reader("wor_addnote").ToString())
+                            txtStok.Text = If(IsDBNull(reader("wor_stok")), "", reader("wor_stok").ToString())
+                            txtTotalOrder.Text = If(IsDBNull(reader("wor_total_order")), "", reader("wor_total_order").ToString())
+                            txtTglProduksi.Text = If(IsDBNull(reader("wor_tglproduksi")), "", reader("wor_tglproduksi").ToString())
                         Else
                             Response.Write("<script>alert('Data Work Order tidak ditemukan!');</script>")
                         End If

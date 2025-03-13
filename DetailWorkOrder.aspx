@@ -126,9 +126,18 @@
                     </div>
 
                     <table class="table table-bordered">
-                        <tr><th>Jumlah Stok</th><td>672</td></tr>
-                        <tr><th>Total Order</th><td>21772</td></tr>
-                        <tr><th>Tgl Produksi Dibutuhkan</th><td>20, 21, 22 Jan 2025</td></tr>
+                        <tr>
+                            <th>Jumlah Stok</th>
+                            <td><asp:TextBox ID="txtStok" runat="server" CssClass="form-control" disabled TextMode="Number"></asp:TextBox></td>
+                        </tr>
+                        <tr>
+                            <th>Total Order</th>
+                            <td><asp:TextBox ID="txtTotalOrder" runat="server" CssClass="form-control" disabled TextMode="Number"></asp:TextBox></td>
+                        </tr>
+                        <tr>
+                            <th>Tgl Produksi Dibutuhkan</th>
+                            <td><asp:TextBox ID="txtTglProduksi" runat="server" CssClass="form-control" disabled></asp:TextBox></td>
+                        </tr>
                     </table>
 
                 </div>
