@@ -13,6 +13,10 @@
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    
+    <!-- SweetAlert -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 
     <script type="text/javascript">
         $(document).ready(function () {
@@ -28,6 +32,8 @@
             // Aktifkan Select2
             $('.select2').select2();
         });
+
+
     </script>
 
     <style>
@@ -188,13 +194,52 @@
                                             <%# GetStatusText(Eval("wor_status")) %>
                                         </td>
                                         <td>
+<<<<<<< HEAD
                                             <%# If(Eval("wor_no").ToString() <> "No data available in table", 
                                                     "<a href='DetailWorkOrder.aspx?wor_no=" & Eval("wor_no") & "' class='btn btn-info btn-sm'>Detail</a>", 
                                                     "") %>
                                         </td>                                    
+=======
+                                            <%# GetActionButtons(Eval("wor_status"), Eval("wor_no")) %>
+                                        </td>
+>>>>>>> 9b530edfd07fafb9c62ba3a8567939586c4fde00
                                     </tr>
                                 </ItemTemplate>
                                 <FooterTemplate>
+
+                                            <script>
+                                                function respondToWorkOrder(worNo) {
+                                                    Swal.fire({
+                                                        title: "Apakah Anda ingin merespons WO ini?",
+                                                        text: "no WO: " + worNo,
+                                                        icon: "question",
+                                                        showCancelButton: true,
+                                                        confirmButtonColor: "#3085d6",
+                                                        cancelButtonColor: "#d33",
+                                                        confirmButtonText: "Ya, Lanjutkan",
+                                                        cancelButtonText: "Batal"
+                                                    }).then((result) => {
+                                                        if (result.isConfirmed) {
+                                                            $.ajax({
+                                                                type: "POST",
+                                                                url: "ViewWorkOrder.aspx/OnResponse",
+                                                                data: JSON.stringify({ worNo: worNo }),
+                                                                contentType: "application/json; charset=utf-8",
+                                                                dataType: "json",
+                                                                success: function (response) {
+                                                                    Swal.fire("Sukses", response.d, "success").then(() => {
+                                                                        location.reload();
+                                                                    });
+                                                                },
+                                                                error: function (xhr, status, error) {
+                                                                    Swal.fire("Error", "Terjadi kesalahan: " + xhr.responseText, "error");
+                                                                }
+                                                            });
+                                                        }
+                                                    });
+                                                }
+
+                                            </script>
                                         </tbody>
                                     </table>
                                 </FooterTemplate>

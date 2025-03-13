@@ -13,12 +13,23 @@ Partial Class DetailWorkOrder
         End If
 
         If Not IsPostBack Then
+<<<<<<< HEAD
             If Request.QueryString("wor_no") IsNot Nothing Then
                 Dim worNo As String = Request.QueryString("wor_no")
                 LoadWorkOrderDetails()
                 LoadMachineDropdown()
                 LoadMoldToolDropdown()
                 LoadUploadedFiles()
+=======
+            Dim worNo As String = Request.QueryString("wor_no")
+            LoadWorkOrderDetails()
+            LoadMachineDropdown()
+            LoadMoldToolDropdown()
+            LoadUploadedFiles()
+
+            If Request.QueryString("wor_no") IsNot Nothing Then
+
+>>>>>>> 9b530edfd07fafb9c62ba3a8567939586c4fde00
             Else
                 Response.Write("<script>alert('Nomor Work Order tidak ditemukan!'); window.location='ViewWorkOrder.aspx';</script>")
             End If
@@ -76,7 +87,11 @@ Partial Class DetailWorkOrder
             Exit Sub
         End If
 
+<<<<<<< HEAD
         Dim query As String = "SELECT u.spl_nama, w.wor_damage, w.wor_machine, w.wor_mold_tool, w.wor_repairby, w.wor_lampiran, w.wor_addnote, w.wor_status, w.wor_createby, w.wor_createdate, w.wor_stok, w.wor_total_order, w.wor_tglproduksi FROM t_workorder w LEFT JOIN tlkp_supplier u ON w.wor_supplier = u.spl_id WHERE w.wor_no = @wor_no"
+=======
+        Dim query As String = "SELECT u.spl_nama, w.wor_damage, w.wor_machine, w.wor_mold_tool, w.wor_repairby, w.wor_lampiran, w.wor_addnote, w.wor_status, w.wor_createby, w.wor_createdate FROM t_workorder w LEFT JOIN tlkp_supplier u ON w.wor_supplier = u.spl_id WHERE w.wor_no = @wor_no"
+>>>>>>> 9b530edfd07fafb9c62ba3a8567939586c4fde00
 
         Using conn As New SqlConnection(connStr)
             Using cmd As New SqlCommand(query, conn)
@@ -104,9 +119,12 @@ Partial Class DetailWorkOrder
 
                             'txtLampiran.Text = If(IsDBNull(reader("wor_lampiran")), "", reader("wor_lampiran").ToString())
                             txtketerangan.Text = If(IsDBNull(reader("wor_addnote")), "", reader("wor_addnote").ToString())
+<<<<<<< HEAD
                             txtStok.Text = If(IsDBNull(reader("wor_stok")), "", reader("wor_stok").ToString())
                             txtTotalOrder.Text = If(IsDBNull(reader("wor_total_order")), "", reader("wor_total_order").ToString())
                             txtTglProduksi.Text = If(IsDBNull(reader("wor_tglproduksi")), "", reader("wor_tglproduksi").ToString())
+=======
+>>>>>>> 9b530edfd07fafb9c62ba3a8567939586c4fde00
                         Else
                             Response.Write("<script>alert('Data Work Order tidak ditemukan!');</script>")
                         End If
@@ -175,7 +193,11 @@ Partial Class DetailWorkOrder
 
             Try
                 ' Cek apakah sudah pernah approve sebelumnya
+<<<<<<< HEAD
                 Dim queryCheck As String = "SELECT COUNT(*) FROM t_detailworkorder WHERE dt_wor_no = @wor_no AND dt_approve1by = @npk"
+=======
+                Dim queryCheck As String = "SELECT COUNT(*) FROM t_detailworkorder WHERE dt_wor_no = @wor_no AND dt_createby = @npk AND dt_level = 'Level 1'"
+>>>>>>> 9b530edfd07fafb9c62ba3a8567939586c4fde00
                 Using cmdCheck As New SqlCommand(queryCheck, conn, transaction)
                     cmdCheck.Parameters.AddWithValue("@wor_no", worNo)
                     cmdCheck.Parameters.AddWithValue("@npk", npk)
@@ -183,7 +205,11 @@ Partial Class DetailWorkOrder
 
                     ' Jika belum ada approval dari user ini, lanjut insert
                     If count = 0 Then
+<<<<<<< HEAD
                         Dim queryInsert As String = "INSERT INTO t_detailworkorder (dt_wor_no, dt_approve1by, dt_approve1date) VALUES(@wor_no, @npk, @approveDate)"
+=======
+                        Dim queryInsert As String = "INSERT INTO t_detailworkorder (dt_wor_no, dt_createby, dt_createdate, dt_level) VALUES(@wor_no, @npk, @approveDate, 'Level 1')"
+>>>>>>> 9b530edfd07fafb9c62ba3a8567939586c4fde00
                         Using cmdInsert As New SqlCommand(queryInsert, conn, transaction)
                             cmdInsert.Parameters.AddWithValue("@wor_no", worNo)
                             cmdInsert.Parameters.AddWithValue("@npk", npk)
@@ -275,7 +301,11 @@ Partial Class DetailWorkOrder
                 End If
 
                 ' Simpan data ke tabel t_detailworkorder
+<<<<<<< HEAD
                 Dim queryInsert As String = "INSERT INTO t_detailworkorder (dt_wor_no, dt_alasanreject, dt_rejectby) VALUES(@wor_no, @reason, @npk)"
+=======
+                Dim queryInsert As String = "INSERT INTO t_detailworkorder (dt_wor_no, dt_alasanreject, dt_createby, dt_createdate, dt_level) VALUES(@wor_no, @reason, @npk, GETDATE(), 'Level 0')"
+>>>>>>> 9b530edfd07fafb9c62ba3a8567939586c4fde00
                 Using cmdInsert As New SqlCommand(queryInsert, conn, transaction)
                     cmdInsert.Parameters.AddWithValue("@wor_no", worNo)
                     cmdInsert.Parameters.AddWithValue("@reason", rejectReason)
