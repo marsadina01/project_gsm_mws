@@ -20,14 +20,27 @@ Partial Class AddWorkOrder
             ViewState("namafull") = txtrequestor.Text
             lblidreq.Text = Session("npk").ToString()
             LoadMachines()
-<<<<<<< HEAD
-=======
+
+            ' Pastikan tombol yang terakhir dipilih tetap aktif setelah reload
+            Dim selectedButton As String = If(ViewState("selectedButton"), "")
+
+            If selectedButton = "Mold" Then
+                btnMold.CssClass = "btn custom-dark-btn active-btn mx-2"
+                btnTool.CssClass = "btn custom-dark-btn mx-2"
+            ElseIf selectedButton = "Tool" Then
+                btnTool.CssClass = "btn custom-dark-btn active-btn mx-2"
+                btnMold.CssClass = "btn custom-dark-btn mx-2"
+            Else
+                ' Jika tidak ada yang diklik, gunakan default
+                btnMold.CssClass = "btn custom-dark-btn mx-2"
+                btnTool.CssClass = "btn custom-dark-btn mx-2"
+            End If
         Else
             ' Ambil kembali dari ViewState saat postback
             If ViewState("namafull") IsNot Nothing Then
                 txtrequestor.Text = ViewState("namafull").ToString()
             End If
->>>>>>> 9b530edfd07fafb9c62ba3a8567939586c4fde00
+
             'dataMoldTool("")
         End If
     End Sub
@@ -99,7 +112,8 @@ Partial Class AddWorkOrder
 
     ' Tombol memilih Mold
     Protected Sub btnMold_Click(ByVal sender As Object, ByVal e As EventArgs)
-        selectedType = "BM"
+        ViewState("selectedType") = "BM"
+        ViewState("selectedButton") = "Mold" ' Simpan pilihan tombol di ViewState
         ViewState("wor_no") = GenerateWorkOrderNumber("BM") ' Simpan wor_no di ViewState
         'Response.Write("Work Order Number: " & ViewState("wor_no").ToString()) ' Cetak nomor
         dataMoldTool("1") ' Load dropdown Mold
@@ -107,7 +121,8 @@ Partial Class AddWorkOrder
 
     ' Tombol memilih Tool
     Protected Sub btnTool_Click(ByVal sender As Object, ByVal e As EventArgs)
-        selectedType = "BT"
+        ViewState("selectedType") = "BT"
+        ViewState("selectedButton") = "Tool" ' Simpan pilihan tombol di ViewState
         ViewState("wor_no") = GenerateWorkOrderNumber("BT") ' Simpan wor_no di ViewState
         dataMoldTool("2") ' Load dropdown Tool
     End Sub
@@ -143,11 +158,7 @@ Partial Class AddWorkOrder
 
         Dim worNo As String = ViewState("wor_no").ToString()
         Dim worSupplier As String = Session("nameinfor").ToString()
-<<<<<<< HEAD
-        Dim worDamage As String = txtkerusakan.Text.Trim()
-=======
         Dim worDamage As String = txtKerusakan.Text.Trim()
->>>>>>> 9b530edfd07fafb9c62ba3a8567939586c4fde00
         Dim worMoldTool As String = ddlMoldTool.SelectedValue
         Dim worMachine As String = ddlmachine.SelectedValue
         Dim worRepairBy As String = If(chkKirimGS.Checked, "GS", "Supplier")
@@ -179,12 +190,8 @@ Partial Class AddWorkOrder
             ' Cek apakah file yang diupload masuk dalam daftar yang diperbolehkan
             If allowedExtensions.Contains(fileExtension) Then
                 ' Buat format nama file: MWS_YYYYMMDD_no_wor.ext
-<<<<<<< HEAD
                 Dim fileName As String = "MWS_" & DateTime.Now.ToString("yyyyMMdd") & "_" & worNo & fileExtension
-=======
                 Dim numWor As String = worNo.Replace("/", "_")
-                Dim fileName As String = "MWS_" & DateTime.Now.ToString("yyyyMMdd") & "_" & numWor & fileExtension
->>>>>>> 9b530edfd07fafb9c62ba3a8567939586c4fde00
                 Dim filePath As String = Path.Combine(folderPath, fileName)
 
                 ' Simpan file ke folder

@@ -12,6 +12,14 @@
 
     <script type="text/javascript">
         $(document).ready(function () {
+            $(".custom-dark-btn").click(function () {
+                $(".custom-dark-btn").removeClass("active-btn"); // Hapus semua highlight sebelumnya
+                $(this).addClass("active-btn"); // Tambahkan highlight ke tombol yang diklik
+            });
+        });
+
+
+        $(document).ready(function () {
             var url = window.location;
             $('.sidebar .sidebar-menu').find('.active').removeClass('active');
             $('.sidebar .sidebar-menu li a').each(function () {
@@ -20,17 +28,6 @@
                 }
             });
         });
-
-        function setActive(button) {
-            // Ambil semua tombol dengan class 'custom-dark-btn'
-            var buttons = document.querySelectorAll(".custom-dark-btn");
-
-            // Hapus class 'active-btn' dari semua tombol
-            buttons.forEach(btn => btn.classList.remove("active-btn"));
-
-            // Tambahkan class 'active-btn' ke tombol yang diklik
-            button.classList.add("active-btn");
-        }
 
         function toggleUploadBox() {
             var uploadBox = document.getElementById("uploadBox");
@@ -71,7 +68,7 @@
 
         /* Warna default */
         .custom-dark-btn {
-            background-color: #343a40; /* Warna dasar dark */
+            background-color: #343a40; /* Warna dasar */
             color: #fff;
             border: 1px solid #1d2124;
             padding: 10px 20px;
@@ -79,6 +76,9 @@
             font-weight: bold;
             transition: all 0.3s ease-in-out;
             cursor: pointer;
+            display: inline-block;
+            text-align: center;
+            text-decoration: none;
         }
 
         /* Warna hijau saat aktif */
@@ -167,9 +167,9 @@
                     <div class="form-group d-flex justify-content-center w-100 mt-3">
                         <div class="text-center">
                             <asp:LinkButton ID="btnMold" runat="server" class="btn custom-dark-btn mx-2" 
-                                Text="Mold" OnClientClick="setActive(this)" OnClick="btnMold_Click" />
+                                Text="Mold" OnClick="btnMold_Click" />
                             <asp:LinkButton ID="btnTool" runat="server" class="btn custom-dark-btn mx-2" 
-                                Text="Tooling" OnClientClick="setActive(this)" OnClick="btnTool_Click" />
+                                Text="Tooling" OnClick="btnTool_Click" />
                         </div>
                     </div>
                     <div class="form-group row">
@@ -251,5 +251,7 @@
     <!-- AdminLTE for demo purposes -->
     <script src="dist/js/demo.js"></script>
     <script src="bower_components/select2/dist/js/select2.full.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
 
 </asp:Content>

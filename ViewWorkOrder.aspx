@@ -194,15 +194,8 @@
                                             <%# GetStatusText(Eval("wor_status")) %>
                                         </td>
                                         <td>
-<<<<<<< HEAD
-                                            <%# If(Eval("wor_no").ToString() <> "No data available in table", 
-                                                    "<a href='DetailWorkOrder.aspx?wor_no=" & Eval("wor_no") & "' class='btn btn-info btn-sm'>Detail</a>", 
-                                                    "") %>
-                                        </td>                                    
-=======
                                             <%# GetActionButtons(Eval("wor_status"), Eval("wor_no")) %>
                                         </td>
->>>>>>> 9b530edfd07fafb9c62ba3a8567939586c4fde00
                                     </tr>
                                 </ItemTemplate>
                                 <FooterTemplate>
