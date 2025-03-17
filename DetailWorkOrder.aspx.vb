@@ -282,6 +282,13 @@ Partial Class DetailWorkOrder
                     cmdInsert.ExecuteNonQuery()
                 End Using
 
+                ' Update Status Work Order
+                Dim queryUpdate As String = "UPDATE t_workorder SET wor_status = 0 WHERE wor_no = @wor_no"
+                Using cmdUpdate As New SqlCommand(queryUpdate, conn, transaction)
+                    cmdUpdate.Parameters.AddWithValue("@wor_no", worNo)
+                    cmdUpdate.ExecuteNonQuery()
+                End Using
+
                 ' Commit transaksi
                 transaction.Commit()
 
