@@ -2,24 +2,23 @@
 
 <asp:Content ID="Content1" ContentPlaceHolderID="head" Runat="Server">
     <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="bower_components/select2/dist/css/select2.min.css"/>
     <link rel="stylesheet" href="bower_components/font-awesome/css/font-awesome.min.css"/>
     <link rel="stylesheet" href="bower_components/Ionicons/css/ionicons.min.css"/>
-    <link rel="stylesheet" href="bower_components/select2/dist/css/select2.min.css"/>
     <link rel="stylesheet" href="dist/css/AdminLTE.min.css"/>
     <link rel="stylesheet" href="dist/css/skins/_all-skins.min.css"/>
      <!-- DataTables -->
     <link rel="stylesheet" href="bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css"/>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
+
+    <!-- Pastikan jQuery dipanggil lebih awal -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
 
     <script type="text/javascript">
-        $(document).ready(function () {
-            $(".custom-dark-btn").click(function () {
-                $(".custom-dark-btn").removeClass("active-btn"); // Hapus semua highlight sebelumnya
-                $(this).addClass("active-btn"); // Tambahkan highlight ke tombol yang diklik
-            });
-        });
-
 
         $(document).ready(function () {
+            initSelect2();
             var url = window.location;
             $('.sidebar .sidebar-menu').find('.active').removeClass('active');
             $('.sidebar .sidebar-menu li a').each(function () {
@@ -62,9 +61,34 @@
             }
             return true;
         }
+
+        function initSelect2() {
+            var ddlMachineID = '<%= ddlmachine.ClientID %>';
+            $('#' + ddlMachineID).select2({
+                placeholder: "-- Pilih No Machine --",
+                allowClear: true
+            });
+
+            var ddlMoldToolID = '<%= ddlMoldTool.ClientID %>';
+            $('#' + ddlMoldToolID).select2({
+                placeholder: "-- Pilih ID Mold / Tool --",
+                allowClear: true
+            });
+        }
+
+        Sys.WebForms.PageRequestManager.getInstance().add_endRequest(function () {
+            initSelect2();
+        });
+
     </script>
 
     <style>
+
+        .select2-container .select2-selection--single {
+            height: 38px !important;
+            padding: 5px;
+            border-radius: 4px;
+        }
 
         /* Warna default */
         .custom-dark-btn {
@@ -133,6 +157,7 @@
 </asp:Content>
 
 <asp:Content ID="Content2" ContentPlaceHolderID="ContentPlaceHolder1" Runat="Server">
+    <asp:ScriptManager runat="server" />
     <div class="content-wrapper">
         <section class="content-header">
             <h1 style="font-family:Rubik-Regular;">
@@ -157,10 +182,8 @@
                     <div class="form-group row">
                         <label class="col-sm-3 col-form-label">Machine <span style="color: red">*</span></label>
                         <div class="col-sm-9">   
-                            <asp:DropDownList id="ddlmachine" Runat="server" class="form-control" required="true">
+                            <asp:DropDownList ID="ddlmachine" runat="server" CssClass="form-control select2" required="true">
                                 <asp:ListItem Text="-- Pilih No Machine --" Value="" Selected="True" Disabled="True"></asp:ListItem>
-                                <asp:ListItem Text="Machine 1" Value="1"></asp:ListItem>
-                                <asp:ListItem Text="Machine 2" Value="2"></asp:ListItem>
                             </asp:DropDownList>
                         </div>
                     </div>
@@ -175,8 +198,8 @@
                     <div class="form-group row">
                         <label class="col-sm-3 col-form-label">Mold / Tooling <span style="color: red">*</span></label>
                         <div class="col-sm-9">
-                            <asp:DropDownList ID="ddlMoldTool" runat="server" class="form-control" AppendDataBoundItems="true" required="true">
-                                <asp:ListItem Text="-- Pilih ID Mold / Tool --" Value="" Selected="True" Disabled="True"></asp:ListItem>
+                            <asp:DropDownList ID="ddlMoldTool" runat="server" CssClass="form-control select2" ClientIDMode="Static" onchange="logSelectedMoldTool()">
+                                <asp:ListItem Text="-- Pilih ID Mold / Tool --" Value="" Selected="True"></asp:ListItem>
                             </asp:DropDownList>
                         </div>
                     </div>
@@ -242,6 +265,17 @@
         </section>
     </div>
 
+    <script>
+        function logSelectedMoldTool() {
+            var ddl = document.getElementById("ddlMoldTool");
+            var selectedValue = ddl.value; // Ambil ID yang dipilih
+            var selectedText = ddl.options[ddl.selectedIndex].text; // Ambil nama mold/tool
+            console.log("Selected Mold/Tool ID: " + selectedValue);
+            console.log("Selected Mold/Tool Name: " + selectedText);
+        }
+    </script>
+
+
     <!-- Bootstrap -->
     <script src="bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
     <!-- FastClick -->
@@ -250,8 +284,7 @@
     <script src="dist/js/adminlte.min.js"></script>
     <!-- AdminLTE for demo purposes -->
     <script src="dist/js/demo.js"></script>
-    <script src="bower_components/select2/dist/js/select2.full.min.js"></script>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
+    <%--<script src="bower_components/select2/dist/js/select2.full.min.js"></script>--%>
 
 </asp:Content>

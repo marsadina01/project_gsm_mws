@@ -40,30 +40,34 @@ Partial Class AddWorkOrder
             If ViewState("namafull") IsNot Nothing Then
                 txtrequestor.Text = ViewState("namafull").ToString()
             End If
+<<<<<<< HEAD
 
             'dataMoldTool("")
+=======
+>>>>>>> 4b85bbfab55b26ef8dde31dc38178d13a41ae00a
         End If
     End Sub
+
 
     ' Fungsi untuk mengisi dropdown nama mesin
     Private Sub LoadMachines()
         ddlmachine.Items.Clear()
-        ddlmachine.Items.Add(New ListItem("-- Pilih Mesin --", ""))
+        ddlmachine.Items.Add(New ListItem("-- Pilih No Mesin --", ""))
 
         Using conn As New SqlConnection(connStr)
-            Dim query As String = "SELECT mach_id, mach_name FROM db_purchasing.dbo.tlkp_machine WHERE mach_status = 1"
+            Dim query As String = "SELECT id, mesin_nomor FROM db_maintenance.dbo.tlkp_mesin"
             Using cmd As New SqlCommand(query, conn)
                 conn.Open()
                 Dim reader As SqlDataReader = cmd.ExecuteReader()
                 While reader.Read()
-                    ddlmachine.Items.Add(New ListItem(reader("mach_name").ToString(), reader("mach_id").ToString()))
+                    ddlmachine.Items.Add(New ListItem(reader("mesin_nomor").ToString(), reader("id").ToString()))
                 End While
                 conn.Close()
             End Using
         End Using
     End Sub
 
-    Private Sub dataMoldTool(ByVal type As String)
+    Private Sub dataMoldTool(ByVal type As String, ByVal machineID As String)
         Dim ddlMoldTool As DropDownList = TryCast(Master.FindControl("ContentPlaceHolder1").FindControl("ddlMoldTool"), DropDownList)
         If ddlMoldTool Is Nothing Then Exit Sub
 
@@ -71,15 +75,16 @@ Partial Class AddWorkOrder
         ddlMoldTool.Items.Add(New ListItem("-- Pilih ID Mold / Tool --", ""))
 
         Using conn As New SqlConnection(connStr)
-            Dim query As String = "SELECT mold_id, mold_nama FROM db_purchasing.dbo.tlkp_mold WHERE mold_tipe = @Type AND mold_status = 1"
+            Dim query As String = "SELECT mold_id, mold_name FROM db_master_data.dbo.tlkp_mnt WHERE mold_type = @Type AND mold_status = 1 AND mold_mesin = @MesinID"
             Using cmd As New SqlCommand(query, conn)
                 cmd.Parameters.AddWithValue("@Type", type)
+                cmd.Parameters.AddWithValue("@MesinID", machineID)
 
                 conn.Open()
                 Dim reader As SqlDataReader = cmd.ExecuteReader()
 
                 While reader.Read()
-                    ddlMoldTool.Items.Add(New ListItem(reader("mold_nama").ToString(), reader("mold_id").ToString()))
+                    ddlMoldTool.Items.Add(New ListItem(reader("mold_name").ToString(), reader("mold_id").ToString()))
                 End While
                 conn.Close()
             End Using
@@ -89,7 +94,6 @@ Partial Class AddWorkOrder
             ddlMoldTool.SelectedIndex = 0
         End If
     End Sub
-
 
     ' Fungsi untuk generate wor_no berdasarkan pilihan Mold atau Tool
     Private Function GenerateWorkOrderNumber(ByVal prefix As String) As String
@@ -110,22 +114,41 @@ Partial Class AddWorkOrder
         Return newWorNo
     End Function
 
-    ' Tombol memilih Mold
+    ' Saat memilih Mold
     Protected Sub btnMold_Click(ByVal sender As Object, ByVal e As EventArgs)
+<<<<<<< HEAD
         ViewState("selectedType") = "BM"
         ViewState("selectedButton") = "Mold" ' Simpan pilihan tombol di ViewState
         ViewState("wor_no") = GenerateWorkOrderNumber("BM") ' Simpan wor_no di ViewState
         'Response.Write("Work Order Number: " & ViewState("wor_no").ToString()) ' Cetak nomor
         dataMoldTool("1") ' Load dropdown Mold
+=======
+        Dim machineID As String = ddlmachine.SelectedValue
+        If String.IsNullOrEmpty(machineID) Then Exit Sub
+
+        ViewState("selectedType") = "1" ' Simpan pilihan di ViewState
+        ViewState("wor_no") = GenerateWorkOrderNumber("BM")
+        dataMoldTool(ViewState("selectedType").ToString(), machineID)
+>>>>>>> 4b85bbfab55b26ef8dde31dc38178d13a41ae00a
     End Sub
 
-    ' Tombol memilih Tool
+    ' Saat memilih Tool
     Protected Sub btnTool_Click(ByVal sender As Object, ByVal e As EventArgs)
+<<<<<<< HEAD
         ViewState("selectedType") = "BT"
         ViewState("selectedButton") = "Tool" ' Simpan pilihan tombol di ViewState
         ViewState("wor_no") = GenerateWorkOrderNumber("BT") ' Simpan wor_no di ViewState
         dataMoldTool("2") ' Load dropdown Tool
+=======
+        Dim machineID As String = ddlmachine.SelectedValue
+        If String.IsNullOrEmpty(machineID) Then Exit Sub
+
+        ViewState("selectedType") = "2" ' Simpan pilihan di ViewState
+        ViewState("wor_no") = GenerateWorkOrderNumber("BT")
+        dataMoldTool(ViewState("selectedType").ToString(), machineID)
+>>>>>>> 4b85bbfab55b26ef8dde31dc38178d13a41ae00a
     End Sub
+
 
     Protected Sub btnUpload_Click(ByVal sender As Object, ByVal e As EventArgs)
         ' Cek apakah ada file yang dipilih

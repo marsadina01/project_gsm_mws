@@ -21,6 +21,7 @@
     <script type="text/javascript">
         $(document).ready(function () {
             $('#myTable').DataTable({
+                "scrollX": true,
                 "paging": true,
                 "lengthChange": true,
                 "searching": true,
@@ -37,6 +38,12 @@
     </script>
 
     <style>
+
+        .table-responsive {
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+
         .btn-reset {
             display: inline-block;
             padding: 8px 16px;
@@ -158,86 +165,87 @@
                         </div>
                         
                         <div class="box-body">
-                            <asp:Repeater ID="rptWorkOrder" runat="server">
-                                <HeaderTemplate>
-                                    <table id="myTable" class="display" style="width:100%">
-                                        <thead>
-                                            <tr class="center">
-                                                <th>No</th>
-                                                <th>Work Order</th>
-                                                <th>Supplier</th>
-                                                <th>Kerusakan</th>
-                                                <th>No Mold/Tool</th>
-                                                <th>Request Date</th>
-                                                <th>Response Date</th>
-                                                <th>Repair By</th>
-                                                <th>Finished Date</th>
-                                                <th>Status</th>
-                                                <th>Aksi</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                </HeaderTemplate>
-                                <ItemTemplate>
-                                    <tr>
-                                        <asp:Label visible="false" ID="lblno" Text='<%# Eval("wor_no") %>' runat="server" />
-                                        <td><%# Container.ItemIndex + 1 %></td>
-                                        <td><%# Eval("wor_no") %></td>
-                                        <td><%# Eval("wor_supplier") %></td>
-                                        <td><%# Eval("wor_damage") %></td>
-                                        <td><%# Eval("wor_mold_tool") %></td>
-                                        <td><%# Eval("wor_createdate", "{0:dd/MM/yyyy HH:mm}") %></td>
-                                        <td><%# Eval("wor_responsedate", "{0:dd/MM/yyyy HH:mm}") %></td>
-                                        <td><%# Eval("wor_repairby") %></td>
-                                        <td><%# Eval("wor_finisheddate", "{0:dd/MM/yyyy HH:mm}") %></td>
-                                        <td style='<%# GetStatusStyle(Eval("wor_status")) %>'>
-                                            <%# GetStatusText(Eval("wor_status")) %>
-                                        </td>
-                                        <td>
-                                            <%# GetActionButtons(Eval("wor_status"), Eval("wor_no")) %>
-                                        </td>
-                                    </tr>
-                                </ItemTemplate>
-                                <FooterTemplate>
+                            <div class="table-responsive">
+                                <asp:Repeater ID="rptWorkOrder" runat="server">
+                                    <HeaderTemplate>
+                                        <table id="myTable" class="display nowrap" style="width:100%">
+                                            <thead>
+                                                <tr class="center">
+                                                    <th>No</th>
+                                                    <th>Work Order</th>
+                                                    <th>Supplier</th>
+                                                    <th>Kerusakan</th>
+                                                    <th>No Mold/Tool</th>
+                                                    <th>Request Date</th>
+                                                    <th>Response Date</th>
+                                                    <th>Repair By</th>
+                                                    <th>Finished Date</th>
+                                                    <th>Status</th>
+                                                    <th>Aksi</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                    </HeaderTemplate>
+                                    <ItemTemplate>
+                                        <tr>
+                                            <asp:Label visible="false" ID="lblno" Text='<%# Eval("wor_no") %>' runat="server" />
+                                            <td><%# Container.ItemIndex + 1 %></td>
+                                            <td><%# Eval("wor_no") %></td>
+                                            <td><%# Eval("wor_supplier") %></td>
+                                            <td><%# Eval("wor_damage") %></td>
+                                            <td><%# Eval("wor_mold_tool") %></td>
+                                            <td><%# Eval("wor_createdate", "{0:dd/MM/yyyy HH:mm}") %></td>
+                                            <td><%# Eval("wor_responsedate", "{0:dd/MM/yyyy HH:mm}") %></td>
+                                            <td><%# Eval("wor_repairby") %></td>
+                                            <td><%# Eval("wor_finisheddate", "{0:dd/MM/yyyy HH:mm}") %></td>
+                                            <td style='<%# GetStatusStyle(Eval("wor_status")) %>'>
+                                                <%# GetStatusText(Eval("wor_status")) %>
+                                            </td>
+                                            <td>
+                                                <%# GetActionButtons(Eval("wor_status"), Eval("wor_no")) %>
+                                            </td>
+                                        </tr>
+                                    </ItemTemplate>
+                                    <FooterTemplate>
 
-                                            <script>
-                                                function respondToWorkOrder(worNo) {
-                                                    Swal.fire({
-                                                        title: "Apakah Anda ingin merespons WO ini?",
-                                                        text: "no WO: " + worNo,
-                                                        icon: "question",
-                                                        showCancelButton: true,
-                                                        confirmButtonColor: "#3085d6",
-                                                        cancelButtonColor: "#d33",
-                                                        confirmButtonText: "Ya, Lanjutkan",
-                                                        cancelButtonText: "Batal"
-                                                    }).then((result) => {
-                                                        if (result.isConfirmed) {
-                                                            $.ajax({
-                                                                type: "POST",
-                                                                url: "ViewWorkOrder.aspx/OnResponse",
-                                                                data: JSON.stringify({ worNo: worNo }),
-                                                                contentType: "application/json; charset=utf-8",
-                                                                dataType: "json",
-                                                                success: function (response) {
-                                                                    Swal.fire("Sukses", response.d, "success").then(() => {
-                                                                        location.reload();
-                                                                    });
-                                                                },
-                                                                error: function (xhr, status, error) {
-                                                                    Swal.fire("Error", "Terjadi kesalahan: " + xhr.responseText, "error");
-                                                                }
-                                                            });
-                                                        }
-                                                    });
-                                                }
+                                                <script>
+                                                    function respondToWorkOrder(worNo) {
+                                                        Swal.fire({
+                                                            title: "Apakah Anda ingin merespons WO ini?",
+                                                            text: "no WO: " + worNo,
+                                                            icon: "question",
+                                                            showCancelButton: true,
+                                                            confirmButtonColor: "#3085d6",
+                                                            cancelButtonColor: "#d33",
+                                                            confirmButtonText: "Ya, Lanjutkan",
+                                                            cancelButtonText: "Batal"
+                                                        }).then((result) => {
+                                                            if (result.isConfirmed) {
+                                                                $.ajax({
+                                                                    type: "POST",
+                                                                    url: "ViewWorkOrder.aspx/OnResponse",
+                                                                    data: JSON.stringify({ worNo: worNo }),
+                                                                    contentType: "application/json; charset=utf-8",
+                                                                    dataType: "json",
+                                                                    success: function (response) {
+                                                                        Swal.fire("Sukses", response.d, "success").then(() => {
+                                                                            location.reload();
+                                                                        });
+                                                                    },
+                                                                    error: function (xhr, status, error) {
+                                                                        Swal.fire("Error", "Terjadi kesalahan: " + xhr.responseText, "error");
+                                                                    }
+                                                                });
+                                                            }
+                                                        });
+                                                    }
 
-                                            </script>
-                                        </tbody>
-                                    </table>
-                                </FooterTemplate>
-                            </asp:Repeater>
-
+                                                </script>
+                                            </tbody>
+                                        </table>
+                                    </FooterTemplate>
+                                </asp:Repeater>
+                            </div>
                         </div>
 
                     </div>

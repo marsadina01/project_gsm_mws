@@ -41,7 +41,7 @@ Partial Class ViewWorkOrder
                                     " w.wor_no," +
                                     " s.spl_nama As wor_supplier," +
                                     " w.wor_damage," +
-                                    " m.mold_nama As wor_mold_tool," +
+                                    " m.mold_name As wor_mold_tool," +
                                     " w.wor_createdate," +
                                     " w.wor_responsedate," +
                                     " w.wor_repairby," +
@@ -49,7 +49,7 @@ Partial Class ViewWorkOrder
                                     " w.wor_status  " +
                                  "From db_purchasing.dbo.t_workorder w " +
                                     "INNER Join db_purchasing.dbo.tlkp_supplier s ON w.wor_supplier = s.spl_id " +
-                                    "INNER Join db_purchasing.dbo.tlkp_mold m ON w.wor_mold_tool = m.mold_id " +
+                                    "INNER Join db_master_data.dbo.tlkp_mnt m ON w.wor_mold_tool = m.mold_id " +
                                  "WHERE 1 = 1 "
 
         ' Tambahkan filter berdasarkan Session("namainfor") jika ada
@@ -220,7 +220,7 @@ Partial Class ViewWorkOrder
 
         If Not String.IsNullOrEmpty(workOrderNo) AndAlso workOrderNo <> "No data available in table" Then
             buttons &= "<a href='DetailWorkOrder.aspx?wor_no=" & workOrderNo & "' class='btn btn-info btn-sm' title='Detail' style='margin-right: 5px;'>"
-            buttons &= "<i class='fa fa-eye'></i> Detail</a>"
+            buttons &= "<i class='fa fa-eye'></i></a>"
         End If
 
         Return buttons
