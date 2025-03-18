@@ -40,11 +40,6 @@ Partial Class AddWorkOrder
             If ViewState("namafull") IsNot Nothing Then
                 txtrequestor.Text = ViewState("namafull").ToString()
             End If
-<<<<<<< HEAD
-
-            'dataMoldTool("")
-=======
->>>>>>> 4b85bbfab55b26ef8dde31dc38178d13a41ae00a
         End If
     End Sub
 
@@ -116,37 +111,30 @@ Partial Class AddWorkOrder
 
     ' Saat memilih Mold
     Protected Sub btnMold_Click(ByVal sender As Object, ByVal e As EventArgs)
-<<<<<<< HEAD
-        ViewState("selectedType") = "BM"
-        ViewState("selectedButton") = "Mold" ' Simpan pilihan tombol di ViewState
-        ViewState("wor_no") = GenerateWorkOrderNumber("BM") ' Simpan wor_no di ViewState
-        'Response.Write("Work Order Number: " & ViewState("wor_no").ToString()) ' Cetak nomor
-        dataMoldTool("1") ' Load dropdown Mold
-=======
+        Session("selectedType") = "Mold"
+
+        btnMold.CssClass = "btn custom-dark-btn mx-2 active-btn"
+        btnTool.CssClass = "btn custom-dark-btn mx-2"
         Dim machineID As String = ddlmachine.SelectedValue
         If String.IsNullOrEmpty(machineID) Then Exit Sub
 
         ViewState("selectedType") = "1" ' Simpan pilihan di ViewState
         ViewState("wor_no") = GenerateWorkOrderNumber("BM")
         dataMoldTool(ViewState("selectedType").ToString(), machineID)
->>>>>>> 4b85bbfab55b26ef8dde31dc38178d13a41ae00a
     End Sub
 
     ' Saat memilih Tool
     Protected Sub btnTool_Click(ByVal sender As Object, ByVal e As EventArgs)
-<<<<<<< HEAD
-        ViewState("selectedType") = "BT"
-        ViewState("selectedButton") = "Tool" ' Simpan pilihan tombol di ViewState
-        ViewState("wor_no") = GenerateWorkOrderNumber("BT") ' Simpan wor_no di ViewState
-        dataMoldTool("2") ' Load dropdown Tool
-=======
+        Session("selectedType") = "Tooling"
+
+        btnTool.CssClass = "btn custom-dark-btn mx-2 active-btn"
+        btnMold.CssClass = "btn custom-dark-btn mx-2"
         Dim machineID As String = ddlmachine.SelectedValue
         If String.IsNullOrEmpty(machineID) Then Exit Sub
 
         ViewState("selectedType") = "2" ' Simpan pilihan di ViewState
         ViewState("wor_no") = GenerateWorkOrderNumber("BT")
         dataMoldTool(ViewState("selectedType").ToString(), machineID)
->>>>>>> 4b85bbfab55b26ef8dde31dc38178d13a41ae00a
     End Sub
 
 
@@ -213,9 +201,19 @@ Partial Class AddWorkOrder
             ' Cek apakah file yang diupload masuk dalam daftar yang diperbolehkan
             If allowedExtensions.Contains(fileExtension) Then
                 ' Buat format nama file: MWS_YYYYMMDD_no_wor.ext
-                Dim fileName As String = "MWS_" & DateTime.Now.ToString("yyyyMMdd") & "_" & worNo & fileExtension
                 Dim numWor As String = worNo.Replace("/", "_")
+                Dim fileName As String = "MWS_" & DateTime.Now.ToString("yyyyMMdd") & "_" & numWor & fileExtension
                 Dim filePath As String = Path.Combine(folderPath, fileName)
+                Try
+                    fuLampiran.SaveAs(filePath)
+                    If File.Exists(filePath) Then
+                        Response.Write("<script>alert('File berhasil disimpan di: " & filePath & "');</script>")
+                    Else
+                        Response.Write("<script>alert('File gagal disimpan di: " & filePath & "');</script>")
+                    End If
+                Catch ex As Exception
+                    Response.Write("<script>alert('Error saat menyimpan file: " & ex.Message & "');</script>")
+                End Try
 
                 ' Simpan file ke folder
                 fuLampiran.SaveAs(filePath)
@@ -238,7 +236,7 @@ Partial Class AddWorkOrder
         Try
             Using conn As New SqlConnection(connStr)
                 Dim query As String = "INSERT INTO db_purchasing.dbo.t_workorder (wor_no, wor_supplier, wor_damage, wor_mold_tool, wor_machine, wor_repairby, wor_addnote, wor_stok, wor_total_order, wor_tglproduksi, wor_status, wor_createby, wor_createdate, wor_lampiran) " &
-                          "VALUES (@WorNo, @WorSupplier, @WorDamage, @WorMoldTool, @WorMachine, @WorRepairBy, @WorAddNote, @WorStok, @WorTotalOrder, @WorTglProduksi, @WorStatus, @WorCreateBy, @WorCreateDate, @WorLampiran)"
+                      "VALUES (@WorNo, @WorSupplier, @WorDamage, @WorMoldTool, @WorMachine, @WorRepairBy, @WorAddNote, @WorStok, @WorTotalOrder, @WorTglProduksi, @WorStatus, @WorCreateBy, @WorCreateDate, @WorLampiran)"
 
                 Using cmd As New SqlCommand(query, conn)
                     cmd.Parameters.AddWithValue("@WorNo", worNo)
@@ -255,6 +253,8 @@ Partial Class AddWorkOrder
                     cmd.Parameters.AddWithValue("@WorCreateBy", worCreateBy)
                     cmd.Parameters.AddWithValue("@WorCreateDate", worCreateDate)
                     cmd.Parameters.AddWithValue("@WorLampiran", worLampiran)
+                    Response.Write("<script>alert('Nama file yang akan disimpan: " & worLampiran & "');</script>")
+
 
                     conn.Open()
                     cmd.ExecuteNonQuery()

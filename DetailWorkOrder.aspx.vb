@@ -12,8 +12,14 @@ Partial Class DetailWorkOrder
             Response.Redirect("default.aspx")
         End If
 
+        ' Ambil wor_no dari QueryString
+        Dim worNo As String = Request.QueryString("wor_no")
+
         If Not IsPostBack Then
-            Dim worNo As String = Request.QueryString("wor_no")
+            ' Tentukan tombol berdasarkan wor_no
+            If Not String.IsNullOrEmpty(worNo) Then
+                SetActiveButton(worNo)
+            End If
             LoadWorkOrderDetails()
             LoadMachineDropdown()
             LoadMoldToolDropdown()
@@ -32,8 +38,20 @@ Partial Class DetailWorkOrder
             End If
         End If
     End Sub
+
+    Private Sub SetActiveButton(ByVal worNo As String)
+        If worNo.StartsWith("BM") Then
+            btnMold.CssClass = "btn btn-outline-primary mx-2 custom-dark-btn active-btn"
+            btnTool.CssClass = "btn btn-outline-primary mx-2 custom-dark-btn"
+        ElseIf worNo.StartsWith("BT") Then
+            btnTool.CssClass = "btn btn-outline-primary mx-2 custom-dark-btn active-btn"
+            btnMold.CssClass = "btn btn-outline-primary mx-2 custom-dark-btn"
+        End If
+    End Sub
+
+
     Private Sub LoadMachineDropdown()
-        Dim query As String = "SELECT mach_id, mach_name FROM tlkp_machine"
+        Dim query As String = "SELECT id, mesin_nomor FROM db_maintenance.dbo.tlkp_mesin"
 
         Using conn As New SqlConnection(connStr)
             Using cmd As New SqlCommand(query, conn)
@@ -41,8 +59,8 @@ Partial Class DetailWorkOrder
                     conn.Open()
                     Dim reader As SqlDataReader = cmd.ExecuteReader()
                     ddlmachine.DataSource = reader
-                    ddlmachine.DataTextField = "mach_name"  ' Teks yang ditampilkan
-                    ddlmachine.DataValueField = "mach_id"  ' Nilai yang akan dipilih
+                    ddlmachine.DataTextField = "mesin_nomor"  ' Teks yang ditampilkan
+                    ddlmachine.DataValueField = "id"  ' Nilai yang akan dipilih
                     ddlmachine.DataBind()
                 Catch ex As Exception
                     Response.Write("<script>alert('Error: " & ex.Message & "');</script>")
@@ -54,7 +72,7 @@ Partial Class DetailWorkOrder
     End Sub
 
     Private Sub LoadMoldToolDropdown()
-        Dim query As String = "SELECT mold_id, mold_nama FROM tlkp_mold"
+        Dim query As String = "SELECT mold_id, mold_name FROM db_master_data.dbo.tlkp_mnt"
 
         Using conn As New SqlConnection(connStr)
             Using cmd As New SqlCommand(query, conn)
@@ -62,7 +80,7 @@ Partial Class DetailWorkOrder
                     conn.Open()
                     Dim reader As SqlDataReader = cmd.ExecuteReader()
                     ddlMoldTool.DataSource = reader
-                    ddlMoldTool.DataTextField = "mold_nama"  ' Nama yang ditampilkan
+                    ddlMoldTool.DataTextField = "mold_name"  ' Nama yang ditampilkan
                     ddlMoldTool.DataValueField = "mold_id"  ' Nilai yang akan disimpan
                     ddlMoldTool.DataBind()
                 Catch ex As Exception
@@ -133,7 +151,6 @@ Partial Class DetailWorkOrder
         Dim fileName As String = ""
         Dim worNo As String = Request.QueryString("wor_no")
 
-
         Dim queryFile As String = "SELECT wor_lampiran FROM t_workorder WHERE wor_no = @wor_no"
 
         Using conn As New SqlConnection(connStr)
@@ -154,13 +171,14 @@ Partial Class DetailWorkOrder
         End Using
 
         If Not String.IsNullOrEmpty(fileName) Then
+            Dim fileUrl As String = ResolveUrl(filePath & fileName)
             lnkLampiran.Visible = True
-            lnkLampiran.NavigateUrl = filePath & fileName
-            lnkLampiran.Text = "📄 Download Lampiran"
+            lnkLampiran.NavigateUrl = "#" ' Prevent default link behavior
+            lnkLampiran.Attributes.Add("onclick", "showLampiranModal('" & fileUrl & "'); return false;")
+            lnkLampiran.Text = "📄 Lihat Lampiran"
         Else
             lnkLampiran.Visible = False
         End If
-
     End Sub
 
 

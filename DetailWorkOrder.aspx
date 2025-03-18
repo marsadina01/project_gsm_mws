@@ -1,16 +1,26 @@
 ﻿<%@ Page Language="VB" MasterPageFile="~/MasterPageNew.master" AutoEventWireup="false" CodeFile="DetailWorkOrder.aspx.vb" Inherits="DetailWorkOrder" %>
 
-<asp:Content ID="Content1" ContentPlaceHolderID="head" Runat="Server">
-    <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.min.css"/>
-    <link rel="stylesheet" href="bower_components/font-awesome/css/font-awesome.min.css"/>
-    <link rel="stylesheet" href="bower_components/Ionicons/css/ionicons.min.css"/>
-    <link rel="stylesheet" href="bower_components/select2/dist/css/select2.min.css"/>
-    <link rel="stylesheet" href="dist/css/AdminLTE.min.css"/>
-    <link rel="stylesheet" href="dist/css/skins/_all-skins.min.css"/>
-     <!-- DataTables -->
-    <link rel="stylesheet" href="bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css"/>
+<asp:Content ID="Content1" ContentPlaceHolderID="head" runat="Server">
+    <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="bower_components/font-awesome/css/font-awesome.min.css" />
+    <link rel="stylesheet" href="bower_components/Ionicons/css/ionicons.min.css" />
+    <link rel="stylesheet" href="bower_components/select2/dist/css/select2.min.css" />
+    <link rel="stylesheet" href="dist/css/AdminLTE.min.css" />
+    <link rel="stylesheet" href="dist/css/skins/_all-skins.min.css" />
+    <!-- DataTables -->
+    <link rel="stylesheet" href="bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css" />
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- Pastikan jQuery dimuat lebih dulu -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+    function showLampiranModal(fileUrl) {
+        document.getElementById("iframeLampiran").src = fileUrl;
+        $("#lampiranModal").modal("show");
+    }
+</script>
+
 
     <script type="text/javascript">
         function setActive(button) {
@@ -29,55 +39,72 @@
     </script>
 
     <style>
-            .file-list {
+        .custom-dark-btn {
+            background-color: #343a40;
+            color: #fff;
+            border: 1px solid #1d2124;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-weight: bold;
+            transition: all 0.3s ease-in-out;
+            cursor: pointer;
+        }
+
+        /* Warna hijau saat aktif */
+        .active-btn {
+            background-color: #28a745 !important;
+            border-color: #1e7e34 !important;
+            color: #fff !important;
+        }
+
+        .file-list {
             padding: 10px;
             border: 1px solid #ddd;
             border-radius: 5px;
             background-color: #f9f9f9;
         }
 
-        .file-list a {
-            display: block;
-            padding: 5px;
-            color: #007bff;
-            font-weight: bold;
-            text-decoration: none;
-        }
+            .file-list a {
+                display: block;
+                padding: 5px;
+                color: #007bff;
+                font-weight: bold;
+                text-decoration: none;
+            }
 
-        .file-list a:hover {
-            text-decoration: underline;
-        }
-     </style>
+                .file-list a:hover {
+                    text-decoration: underline;
+                }
+    </style>
 
     <style>
-    .lampiran-btn {
-        background-color: #87CEEB !important; /* Biru Langit */
-        color: #000 !important; /* Teks Hitam */
-        display: inline-block; /* Biar lebarnya sesuai teks */
-        width: auto; /* Tidak memenuhi parent */
-        max-width: 200px; /* Batasi lebar maksimum */
-        padding: 5px 10px; /* Perkecil padding */
-        font-weight: bold; /* Tulisan lebih tegas */
-        border-radius: 5px; /* Sedikit membulat */
-        border: 1px solid #000; /* Tambahkan border agar lebih jelas */
-        text-align: center; /* Posisikan teks di tengah */
-        white-space: nowrap; /* Hindari teks pecah ke bawah */
-    }
+        .lampiran-btn {
+            background-color: #87CEEB !important; /* Biru Langit */
+            color: #000 !important; /* Teks Hitam */
+            display: inline-block; /* Biar lebarnya sesuai teks */
+            width: auto; /* Tidak memenuhi parent */
+            max-width: 200px; /* Batasi lebar maksimum */
+            padding: 5px 10px; /* Perkecil padding */
+            font-weight: bold; /* Tulisan lebih tegas */
+            border-radius: 5px; /* Sedikit membulat */
+            border: none; /* Tambahkan border agar lebih jelas */
+            white-space: nowrap; /* Hindari teks pecah ke bawah */
+        }
 
-    .lampiran-btn:hover {
-        background-color: #5dade2 !important; /* Warna hover lebih gelap */
-        color: #fff !important; /* Teks putih saat hover */
-    }
-</style>
+            .lampiran-btn:hover {
+                background-color: #5dade2 !important; /* Warna hover lebih gelap */
+                color: #fff !important; /* Teks putih saat hover */
+            }
+    </style>
 
 </asp:Content>
 
-<asp:Content ID="Content2" ContentPlaceHolderID="ContentPlaceHolder1" Runat="Server">
+<asp:Content ID="Content2" ContentPlaceHolderID="ContentPlaceHolder1" runat="Server">
     <div class="content-wrapper">
         <section class="content-header">
             <h1><b>Detail Work Order Request External</b></h1>
-                        <ol class="breadcrumb">
-                <li><a href="ViewWorkOrder.aspx"><i class="fa fa-folder-open"></i> WOR</a></li>
+            <ol class="breadcrumb">
+                <li><a href="ViewWorkOrder.aspx"><i class="fa fa-folder-open"></i>WOR</a></li>
                 <li>Add New</li>
             </ol>
 
@@ -95,13 +122,14 @@
                     <div class="form-group row">
                         <label class="col-sm-3 col-form-label">Machine</label>
                         <div class="col-sm-9">
-                            <asp:DropDownList ID="ddlmachine" Runat="server" class="form-control" disabled></asp:DropDownList>
+                            <asp:DropDownList ID="ddlmachine" runat="server" class="form-control" disabled></asp:DropDownList>
                         </div>
                     </div>
                     <div class="form-group text-center">
-                        <asp:LinkButton ID="btnMold" runat="server" class="btn btn-outline-primary mx-2 custom-dark-btn" OnClientClick="setActive(this)" Text="Mold" />
-                        <asp:LinkButton ID="btnTool" runat="server" class="btn btn-outline-primary mx-2 custom-dark-btn" OnClientClick="setActive(this)" Text="Tooling" />
+                        <asp:LinkButton ID="btnMold" runat="server" CssClass="btn btn-outline-primary mx-2 custom-dark-btn" EnableViewState="true" Text="Mold" Enabled="false"/>
+                        <asp:LinkButton ID="btnTool" runat="server" CssClass="btn btn-outline-primary mx-2 custom-dark-btn" EnableViewState="true" Text="Tooling" Enabled="false"/>
                     </div>
+
                     <div class="form-group row">
                         <label class="col-sm-3 col-form-label">Mold / Tooling</label>
                         <div class="col-sm-9">
@@ -122,47 +150,65 @@
                     </div>
 
                     <div class="form-group">
-                            <asp:CheckBox ID="chkRepairBy" runat="server" Text="Kirim GS untuk Memperbaiki Mold/Tooling" Enabled="false" />
+                        <asp:CheckBox ID="chkRepairBy" runat="server" Text="Kirim GS untuk Memperbaiki Mold/Tooling" Enabled="false" />
                     </div>
 
                     <table class="table table-bordered">
                         <tr>
                             <th>Jumlah Stok</th>
-                            <td><asp:TextBox ID="txtStok" runat="server" CssClass="form-control" disabled TextMode="Number"></asp:TextBox></td>
+                            <td>
+                                <asp:TextBox ID="txtStok" runat="server" CssClass="form-control" disabled TextMode="Number"></asp:TextBox></td>
                         </tr>
                         <tr>
                             <th>Total Order</th>
-                            <td><asp:TextBox ID="txtTotalOrder" runat="server" CssClass="form-control" disabled TextMode="Number"></asp:TextBox></td>
+                            <td>
+                                <asp:TextBox ID="txtTotalOrder" runat="server" CssClass="form-control" disabled TextMode="Number"></asp:TextBox></td>
                         </tr>
                         <tr>
                             <th>Tgl Produksi Dibutuhkan</th>
-                            <td><asp:TextBox ID="txtTglProduksi" runat="server" CssClass="form-control" disabled></asp:TextBox></td>
+                            <td>
+                                <asp:TextBox ID="txtTglProduksi" runat="server" CssClass="form-control" disabled></asp:TextBox></td>
                         </tr>
                     </table>
 
                 </div>
             </div>
-            <div class="box">
-                <div class="form-group row">
-                    <div class="col-sm-9 file-list">
-                        <div class="form-group row">
-                            <div class="col-sm-9">
-                                <asp:HyperLink ID="lnkLampiran" runat="server" Target="_blank" CssClass="btn lampiran-btn" Visible="false">
-                                    Lihat Lampiran
-                                </asp:HyperLink>
-                            </div>
-                        </div>
-                    </div>
+
+            <div class="box box-info">
+                <div class="box-body text-left">
+                    <asp:HyperLink ID="lnkLampiran" runat="server" onClick="showLampiranModal" CssClass="btn lampiran-btn" Visible="false">
+                        Lihat Lampiran
+                    </asp:HyperLink>
                 </div>
             </div>
+
+<!-- Modal untuk menampilkan file -->
+<div id="lampiranModal" class="modal fade" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Lampiran</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body text-center">
+                <iframe id="iframeLampiran" style="width:100%; height:500px; border:none;"></iframe>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
             <div class="form-group d-flex justify-content-between">
                 <asp:Button ID="btnReject" runat="server" class="btn btn-danger" Text="Reject" OnClientClick="showRejectPopup(); return false;" />
                 <asp:Button ID="btnApprove" runat="server" class="btn btn-success" Text="Approve" OnClick="btnApprove_Click" />
             </div>
         </section>
     </div>
-    
-    <div id="rejectPopup" class="modal" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); background:white; padding:20px; border-radius:10px; box-shadow:0px 0px 10px gray;">
+
+    <div id="rejectPopup" class="modal" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 20px; border-radius: 10px; box-shadow: 0px 0px 10px gray;">
         <h4>Alasan Reject</h4>
         <asp:TextBox ID="txtRejectReason" runat="server" CssClass="form-control" TextMode="MultiLine"></asp:TextBox>
         <div class="text-right mt-3">
