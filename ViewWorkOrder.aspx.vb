@@ -144,7 +144,7 @@ Partial Class ViewWorkOrder
             Dim query1 As String = "UPDATE db_purchasing.dbo.t_workorder SET wor_status = 3, wor_responsedate = GETDATE() WHERE wor_no = @wor_no"
 
             ' Query 2: Insert ke tabel t_detailworkorder
-            Dim query2 As String = "INSERT INTO db_purchasing.dbo.t_detailworkorder (dt_wor_no, dt_createby, dt_createdate, dt_level) VALUES (@wor_no, @npk, GETDATE(), 'Level 2')"
+            Dim query2 As String = "INSERT INTO db_purchasing.dbo.t_detailworkorder (dt_wor_no, dt_createby, dt_createdate, dt_level) VALUES (@wor_no, @npk, GETDATE(), 2)"
 
             ' Eksekusi Query 1
             Using cmd1 As New SqlCommand(query1, con, transaction)
@@ -235,7 +235,7 @@ Partial Class ViewWorkOrder
             Case 3 : Return "On Progress"
             Case 4 : Return "Waiting Approval by Technical Superior"
             Case 5 : Return "Done"
-            Case 0 : Return "Cancelled"
+            Case 0 : Return "Canceled"
             Case Else : Return "Unknown"
         End Select
     End Function
