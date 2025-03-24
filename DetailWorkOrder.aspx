@@ -184,6 +184,14 @@
             overflow-y: auto;
         }
 
+        .badge {
+            font-size: 0.875rem;
+            padding: 6px 12px;
+            font-weight: 500;
+            border-radius: 12px;
+        }
+
+
     </style>
 
 </asp:Content>
@@ -229,7 +237,10 @@
                 <div class="col-md-6">
                     <div class="box h-100">
                         <div class="box-body fixed-height">
-                            <h4 class="box-title"><strong>Timeline</strong></h4>
+                            <h4 class="box-title d-flex justify-content-between align-items-center">
+                                <span><strong>Timeline</strong></span>
+                                <asp:Literal ID="litBadgeStatus" runat="server" />
+                            </h4>
                             <hr />
                             <ul class="timeline">
                                 <asp:Literal ID="litTimeline" runat="server"></asp:Literal>
