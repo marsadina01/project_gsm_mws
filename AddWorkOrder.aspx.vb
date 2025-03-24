@@ -206,11 +206,11 @@ Partial Class AddWorkOrder
                 Dim filePath As String = Path.Combine(folderPath, fileName)
                 Try
                     fuLampiran.SaveAs(filePath)
-                    If File.Exists(filePath) Then
-                        Response.Write("<script>alert('File berhasil disimpan di: " & filePath & "');</script>")
-                    Else
-                        Response.Write("<script>alert('File gagal disimpan di: " & filePath & "');</script>")
-                    End If
+                    'If File.Exists(filePath) Then
+                    '    Response.Write("<script>alert('File berhasil disimpan di: " & filePath & "');</script>")
+                    'Else
+                    '    Response.Write("<script>alert('File gagal disimpan di: " & filePath & "');</script>")
+                    'End If
                 Catch ex As Exception
                     Response.Write("<script>alert('Error saat menyimpan file: " & ex.Message & "');</script>")
                 End Try
@@ -224,10 +224,6 @@ Partial Class AddWorkOrder
                 ' Jika jenis file tidak diperbolehkan, tampilkan alert dan hentikan proses
                 Response.Write("<script>alert('Format file tidak diperbolehkan! Hanya JPG, PNG, dan PDF yang bisa diupload.');</script>")
                 Exit Sub
-            End If
-
-            If fuLampiran.HasFile Then
-                Response.Write("<script>alert('File terdeteksi: " & fuLampiran.FileName & "');</script>")
             End If
 
         End If
@@ -253,7 +249,7 @@ Partial Class AddWorkOrder
                     cmd.Parameters.AddWithValue("@WorCreateBy", worCreateBy)
                     cmd.Parameters.AddWithValue("@WorCreateDate", worCreateDate)
                     cmd.Parameters.AddWithValue("@WorLampiran", worLampiran)
-                    Response.Write("<script>alert('Nama file yang akan disimpan: " & worLampiran & "');</script>")
+                    'Response.Write("<script>alert('Nama file yang akan disimpan: " & worLampiran & "');</script>")
 
 
                     conn.Open()
@@ -262,7 +258,15 @@ Partial Class AddWorkOrder
                 End Using
             End Using
 
-            Response.Write("<script>alert('Work Order berhasil disimpan!'); window.location='ViewWorkOrder.aspx';</script>")
+            ClientScript.RegisterStartupScript(Me.GetType(), "alert",
+                "<script>Swal.fire({ " &
+                "title: 'Berhasil!', " &
+                "text: 'Work Order berhasil disimpan!', " &
+                "icon: 'success', " &
+                "confirmButtonText: 'OK' " &
+                "}).then(function() { " &
+                "window.location='ViewWorkOrder.aspx'; });</script>", False)
+
         Catch ex As Exception
             Response.Write("<script>alert('Terjadi kesalahan: " & ex.Message.Replace("'", "\'") & "');</script>")
         End Try

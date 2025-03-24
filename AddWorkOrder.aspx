@@ -14,6 +14,7 @@
     <!-- Pastikan jQuery dipanggil lebih awal -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script type="text/javascript">
         $(document).ready(function () {
@@ -257,11 +258,10 @@
                 <div class="box-body" id="uploadBox" style="display: none;">
                     <div class="upload-area" id="uploadArea">
                         <label for="fileInput" class="upload-icon">
-                            <i class="fa fa-upload"></i> Pilih File
                         </label>
                         <input type="file" id="fileInput" style="display: none;" />
                         <asp:FileUpload ID="fuLampiran" runat="server" />
-                        <asp:Button ID="btnUpload" runat="server" Text="Upload File" OnClick="btnUpload_Click" CssClass="btn btn-primary" />
+<%--                        <asp:Button ID="btnUpload" runat="server" Text="Upload File" OnClick="btnUpload_Click" CssClass="btn btn-primary" />--%>
                         <asp:Label ID="lblMessage" runat="server" ForeColor="Red"></asp:Label>
                     </div>
                 </div>
