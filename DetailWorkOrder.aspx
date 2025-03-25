@@ -23,6 +23,36 @@
 
     <script type="text/javascript">
 
+        function showRejectReason() {
+                    Swal.fire({
+                        title: 'Masukkan alasan reject',
+                        icon: 'info', // ✅ Ikon informasi
+                        input: 'textarea',
+                        inputLabel: 'Alasan',
+                        inputPlaceholder: 'Tulis alasan di sini...',
+                        inputAttributes: {
+                            'aria-label': 'Tulis alasan di sini'
+                        },
+                        showCancelButton: true,
+                        confirmButtonText: 'Submit',
+                        cancelButtonText: 'Batal',
+                        preConfirm: (reason) => {
+                            if (!reason) {
+                                Swal.showValidationMessage('Alasan tidak boleh kosong');
+                            } else {
+                                document.getElementById('<%= hdnRejectReason.ClientID %>').value = reason;
+                        }
+                    }
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        __doPostBack('<%= btnReject.UniqueID %>', '');
+                    }
+                });
+
+            return false;
+        }
+
+
         function setActive(button) {
             var buttons = document.querySelectorAll(".custom-dark-btn");
             buttons.forEach(btn => btn.classList.remove("active-btn"));
@@ -359,11 +389,17 @@
 
 
             <div class="form-group d-flex justify-content-between">
-                <asp:Button ID="btnReject" runat="server" class="btn btn-danger" Text="Reject" OnClientClick="showRejectPopup(); return false;" />
+                <asp:Button ID="btnReject" runat="server"
+                    Text="Reject"
+                    class="btn btn-danger"
+                    OnClientClick="return showRejectReason();"
+                    OnClick="btnReject_Click" />
                 <asp:Button ID="btnApprove" runat="server" class="btn btn-success" Text="Approve" OnClick="btnApprove_Click" />
                 <asp:Button ID="btnCancel" runat="server" class="btn btn-danger" Text="Back" OnClick="btnCancel_Click" />
                 <asp:Button ID="btnClose" runat="server" CssClass="btn btn-primary" Text="Close WO" OnClick="btnClose_Click" />
             </div>
+
+            <asp:HiddenField ID="hdnRejectReason" runat="server" />
         </section>
     </div>
 
