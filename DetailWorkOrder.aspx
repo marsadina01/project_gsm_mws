@@ -18,6 +18,18 @@
 
     <script type="text/javascript">
 
+        document.addEventListener("DOMContentLoaded", function () {
+            var textArea = document.getElementById('<%= txtRejectReason.ClientID %>');
+
+            if (textArea) {
+                textArea.addEventListener("keydown", function (event) {
+                    if (event.key === " ") {
+                        event.stopPropagation(); // Menghentikan JavaScript lain yang mungkin memblokir spasi
+                    }
+                });
+            }
+        });
+
         function setActive(button) {
             var buttons = document.querySelectorAll(".custom-dark-btn");
             buttons.forEach(btn => btn.classList.remove("active-btn"));
@@ -171,6 +183,21 @@
             color: #333;
         }
 
+        .btn-secondary-outline {
+          color: #6c757d; /* Warna teks sesuai btn-secondary */
+          background-color: transparent;
+          border: 2px solid #6c757d; /* Outline sesuai warna btn-secondary */
+          padding: 0.375rem 0.75rem;
+          font-size: 1rem;
+          border-radius: 0.25rem;
+          transition: all 0.3s ease-in-out;
+        }
+
+        .btn-secondary-outline:hover {
+          background-color: #6c757d;
+          color: #fff;
+        }
+
         .h-100 {
             height: 100%;
         }
@@ -178,6 +205,17 @@
         .fixed-height {
             height: 200px; /* Sesuaikan dengan kebutuhan */
             overflow-y: auto;
+        }
+
+        .d-flex {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+        }
+
+        asp\:Literal {
+            white-space: nowrap; /* Mencegah elemen melompat ke baris berikutnya */
         }
 
     </style>
@@ -203,7 +241,7 @@
                     <div class="box">
                         <div class="box-body">
                             <h4 class="box-title"><strong>Information</strong></h4>
-                            <table class="table table-borderless">
+                            <table class="table">
                                 <tr>
                                     <td>Requestor</td>
                                     <td><asp:Label ID="lblrequestor" runat="server"></asp:Label></td>
@@ -225,7 +263,10 @@
                 <div class="col-md-6">
                     <div class="box h-100">
                         <div class="box-body fixed-height">
-                            <h4 class="box-title"><strong>Timeline</strong></h4>
+                            <div class="d-flex justify-content-between align-items-center w-100">
+                                <h4 class="box-title m-0"><strong>Timeline</strong></h4>
+                                <asp:Literal ID="litBadgeStatus" runat="server" />
+                            </div>
                             <hr />
                             <ul class="timeline">
                                 <asp:Literal ID="litTimeline" runat="server"></asp:Literal>
@@ -314,12 +355,10 @@
                 </div>
             </div>
             <div class="box">
-                <div class="box box-info">
-                    <div class="box-body text-left">
-                        <asp:HyperLink ID="lnkLampiran" runat="server" onClick="showLampiranModal" CssClass="btn lampiran-btn" Visible="false">
-                            Lihat Lampiran
-                        </asp:HyperLink>
-                    </div>
+                <div class="box-body text-left">
+                    <asp:HyperLink ID="lnkLampiran" runat="server" onClick="showLampiranModal" CssClass="btn lampiran-btn" Visible="false">
+                        Lihat Lampiran
+                    </asp:HyperLink>
                 </div>
             </div>
 
@@ -343,26 +382,20 @@
             <div class="form-group d-flex justify-content-between">
                 <asp:Button ID="btnReject" runat="server" class="btn btn-danger" Text="Reject" OnClientClick="showRejectPopup(); return false;" />
                 <asp:Button ID="btnApprove" runat="server" class="btn btn-success" Text="Approve" OnClick="btnApprove_Click" />
-                <asp:Button ID="btnCancel" runat="server" class="btn btn-danger" Text="Cancel" OnClick="btnCancel_Click" />
+                <asp:Button ID="btnBack" runat="server" class="btn btn-secondary-outline" Text="Back" OnClick="btnBack_Click" />
                 <asp:Button ID="btnClose" runat="server" CssClass="btn btn-primary" Text="Close WO" OnClick="btnClose_Click" />
             </div>
         </section>
     </div>
     
     <div id="rejectPopup" class="modal" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); background:white; padding:20px; border-radius:10px; box-shadow:0px 0px 10px gray;">
-        <h4>Alasan Reject</h4>
+        <h4><strong>Alasan Reject</strong></h4>
         <asp:TextBox ID="txtRejectReason" runat="server" CssClass="form-control" TextMode="MultiLine"></asp:TextBox>
         <div class="text-right mt-3">
-            <asp:Button ID="btnSubmitReject" runat="server" class="btn btn-danger" Text="Submit" OnClick="btnReject_Click" />
+            <asp:Button ID="btnSubmitReject" runat="server" CssClass="btn btn-danger" Text="Submit" OnClick="btnReject_Click" />
             <button type="button" class="btn btn-secondary" onclick="closeRejectPopup();">Cancel</button>
         </div>
     </div>
-
-    <script>
-        function closeRejectPopup() {
-            document.getElementById("rejectPopup").style.display = "none";
-        }
-    </script>
 
     <!-- Bootstrap -->
     <script src="bower_components/bootstrap/dist/js/bootstrap.min.js"></script>

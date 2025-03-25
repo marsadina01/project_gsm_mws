@@ -29,6 +29,7 @@ Partial Class DetailWorkOrder
 
             ' Cek status Work Order dari database
             Dim worStatus As Integer = GetWorkOrderStatus(worNo)
+            SetStatusBadge(worStatus)
 
             If worStatus = 1 Then
                 If Session("role") = "atsreq" Then
@@ -37,7 +38,7 @@ Partial Class DetailWorkOrder
                     fclose.Visible = False
                     btnApprove.Visible = True
                     btnReject.Visible = True
-                    btnCancel.Visible = False
+                    btnBack.Visible = False
                     btnClose.Visible = False
                 Else
                     detail1.Visible = False
@@ -45,7 +46,7 @@ Partial Class DetailWorkOrder
                     fclose.Visible = False
                     btnApprove.Visible = False
                     btnReject.Visible = False
-                    btnCancel.Visible = True
+                    btnBack.Visible = True
                     btnClose.Visible = False
                 End If
 
@@ -56,7 +57,7 @@ Partial Class DetailWorkOrder
                     fclose.Visible = True
                     btnApprove.Visible = False
                     btnReject.Visible = False
-                    btnCancel.Visible = True
+                    btnBack.Visible = True
                     btnClose.Visible = True
                 Else
                     detail1.Visible = False
@@ -64,7 +65,7 @@ Partial Class DetailWorkOrder
                     fclose.Visible = False
                     btnApprove.Visible = False
                     btnReject.Visible = False
-                    btnCancel.Visible = True
+                    btnBack.Visible = True
                     btnClose.Visible = False
                 End If
 
@@ -75,7 +76,7 @@ Partial Class DetailWorkOrder
                     fclose.Visible = True
                     btnApprove.Visible = True
                     btnReject.Visible = True
-                    btnCancel.Visible = False
+                    btnBack.Visible = False
                     btnClose.Visible = False
                 Else
                     detail1.Visible = False
@@ -83,7 +84,7 @@ Partial Class DetailWorkOrder
                     fclose.Visible = True
                     btnApprove.Visible = False
                     btnReject.Visible = False
-                    btnCancel.Visible = True
+                    btnBack.Visible = True
                     btnClose.Visible = False
                 End If
 
@@ -93,7 +94,7 @@ Partial Class DetailWorkOrder
                 fclose.Visible = True
                 btnApprove.Visible = False
                 btnReject.Visible = False
-                btnCancel.Visible = True
+                btnBack.Visible = True
                 btnClose.Visible = False
             End If
         Else
@@ -351,7 +352,9 @@ Partial Class DetailWorkOrder
                                     Case -1
                                         statusText = "Canceled"
                                     Case -2
-                                        statusText = "Canceled the repair"
+                                        statusText = "Rejected"
+                                    Case -3
+                                        statusText = "Rejected the repair"
                                 End Select
 
                                 ' Tandai item terbaru dengan class "latest"
@@ -384,65 +387,106 @@ Partial Class DetailWorkOrder
         litTimeline.Text = timelineHtml.ToString()
     End Sub
 
-
     ' Fungsi untuk menangani tombol Approve
     Protected Sub btnApprove_Click(sender As Object, e As EventArgs) Handles btnApprove.Click
-        Dim worNo As String = Request.QueryString("wor_no") ' Ambil Work Order No dari URL
-        Dim npk As String = Session("npk") ' Ambil NPK dari session login
+        Dim worNo As String = Request.QueryString("wor_no")
+        Dim npk As String = Session("npk")
+        Dim role As String = Session("role")
         Dim approveDate As String = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")
 
-        If String.IsNullOrEmpty(worNo) Or String.IsNullOrEmpty(npk) Then
+        If String.IsNullOrEmpty(worNo) OrElse String.IsNullOrEmpty(npk) Then
             Response.Write("<script>alert('Data tidak valid!');</script>")
             Exit Sub
         End If
 
-        Dim connStr As String = DecryptString(ConfigurationManager.ConnectionStrings("Conn").ToString())
+        Dim currentStatus As Integer = GetWorkOrderStatus(worNo)
+        Dim newStatus As Integer = 2 ' Default approve awal
+        Dim levelLog As Integer = 1
+        Dim messageTitle As String = "Success!"
+        Dim messageText As String = "Anda telah menyetujui request ini"
+        Dim messageIcon As String = "success"
+
+        ' Penentuan status & level jika role atstek dan status sudah 4
+        If currentStatus = 4 AndAlso (role = "atstekSup" Or role = "atstekGS") Then
+            newStatus = 5
+            levelLog = 4
+            messageText = "Anda telah menyetujui hasil perbaikan dan Work Order telah selesai"
+        ElseIf currentStatus = 1 Then
+            ' Pastikan hanya role yang diizinkan bisa approve status awal
+            If Not (role = "atsreq") Then
+                Response.Write("<script>alert('Anda tidak memiliki akses untuk menyetujui permintaan ini.');</script>")
+                Exit Sub
+            End If
+        End If
+
+        ' Proteksi agar tidak turunkan status (misalnya status 5 jadi 2)
+        If currentStatus >= newStatus Then
+            Exit Sub
+        End If
 
         Using conn As New SqlConnection(connStr)
             conn.Open()
             Dim transaction As SqlTransaction = conn.BeginTransaction()
 
             Try
-                ' Cek apakah sudah pernah approve sebelumnya
-                Dim queryCheck As String = "SELECT COUNT(*) FROM t_detailworkorder WHERE dt_wor_no = @wor_no AND dt_createby = @npk AND dt_level = 1"
+                ' Cek apakah user ini sudah pernah approve dengan level ini
+                Dim queryCheck As String = "SELECT COUNT(*) FROM t_detailworkorder WHERE dt_wor_no = @wor_no AND dt_createby = @npk AND dt_level = @levelLog"
                 Using cmdCheck As New SqlCommand(queryCheck, conn, transaction)
                     cmdCheck.Parameters.AddWithValue("@wor_no", worNo)
                     cmdCheck.Parameters.AddWithValue("@npk", npk)
+                    cmdCheck.Parameters.AddWithValue("@levelLog", levelLog)
                     Dim count As Integer = Convert.ToInt32(cmdCheck.ExecuteScalar())
 
-                    ' Jika belum ada approval dari user ini, lanjut insert
                     If count = 0 Then
-                        Dim queryInsert As String = "INSERT INTO t_detailworkorder (dt_wor_no, dt_createby, dt_createdate, dt_level) VALUES(@wor_no, @npk, @approveDate, 1)"
+                        ' Insert log approval
+                        Dim queryInsert As String = "INSERT INTO t_detailworkorder (dt_wor_no, dt_createby, dt_createdate, dt_level) VALUES(@wor_no, @npk, @approveDate, @levelLog)"
                         Using cmdInsert As New SqlCommand(queryInsert, conn, transaction)
                             cmdInsert.Parameters.AddWithValue("@wor_no", worNo)
                             cmdInsert.Parameters.AddWithValue("@npk", npk)
                             cmdInsert.Parameters.AddWithValue("@approveDate", approveDate)
+                            cmdInsert.Parameters.AddWithValue("@levelLog", levelLog)
                             cmdInsert.ExecuteNonQuery()
                         End Using
                     End If
                 End Using
 
-                ' Update Status Work Order
-                Dim queryUpdate As String = "UPDATE t_workorder SET wor_status = 2 WHERE wor_no = @wor_no"
+                ' Update status Work Order
+                Dim queryUpdate As String
+
+                If newStatus = 5 Then
+                    queryUpdate = "UPDATE t_workorder SET wor_status = @newStatus, wor_finisheddate = @finishDate WHERE wor_no = @wor_no"
+                Else
+                    queryUpdate = "UPDATE t_workorder SET wor_status = @newStatus WHERE wor_no = @wor_no"
+                End If
+
                 Using cmdUpdate As New SqlCommand(queryUpdate, conn, transaction)
                     cmdUpdate.Parameters.AddWithValue("@wor_no", worNo)
+                    cmdUpdate.Parameters.AddWithValue("@newStatus", newStatus)
+
+                    If newStatus = 5 Then
+                        cmdUpdate.Parameters.AddWithValue("@finishDate", DateTime.Now)
+                    End If
+
                     cmdUpdate.ExecuteNonQuery()
                 End Using
 
+
                 transaction.Commit()
+
+                ' SweetAlert success
                 Dim script As String = "<script>" & Environment.NewLine &
-                       "Swal.fire({" & Environment.NewLine &
-                       "    icon: 'success'," & Environment.NewLine &
-                       "    title: 'Success!'," & Environment.NewLine &
-                       "    text: 'Anda telah menyetujui request ini'," & Environment.NewLine &
-                       "    confirmButtonColor: '#28a745'," & Environment.NewLine &
-                       "    allowOutsideClick: false" & Environment.NewLine &
-                       "}).then((result) => {" & Environment.NewLine &
-                       "    if (result.isConfirmed) {" & Environment.NewLine &
-                       "        window.location='ViewWorkOrder.aspx';" & Environment.NewLine &
-                       "    }" & Environment.NewLine &
-                       "});" & Environment.NewLine &
-                       "</script>"
+                "Swal.fire({" & Environment.NewLine &
+                "    icon: '" & messageIcon & "'," & Environment.NewLine &
+                "    title: '" & messageTitle & "'," & Environment.NewLine &
+                "    text: '" & messageText & "'," & Environment.NewLine &
+                "    confirmButtonColor: '#28a745'," & Environment.NewLine &
+                "    allowOutsideClick: false" & Environment.NewLine &
+                "}).then((result) => {" & Environment.NewLine &
+                "    if (result.isConfirmed) {" & Environment.NewLine &
+                "        window.location='ViewWorkOrder.aspx';" & Environment.NewLine &
+                "    }" & Environment.NewLine &
+                "});" & Environment.NewLine &
+                "</script>"
 
                 ClientScript.RegisterStartupScript(Me.GetType(), "approvalSuccess", script)
 
@@ -456,85 +500,93 @@ Partial Class DetailWorkOrder
     End Sub
 
     ' Fungsi untuk menangani tombol Reject
-    Protected Sub btnReject_Click(ByVal sender As Object, ByVal e As EventArgs)
+    Protected Sub btnReject_Click(ByVal sender As Object, ByVal e As EventArgs) Handles btnReject.Click
+        Dim worNo As String = Request.QueryString("wor_no")
+        Dim npk As String = Session("npk")
+        Dim role As String = Session("role")
+        Dim rejectDate As String = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")
+
         Dim rejectReason As String = txtRejectReason.Text ' Ambil alasan reject dari textarea
         If String.IsNullOrEmpty(rejectReason) Then
             Response.Write("<script>alert('Alasan Reject harus diisi!');</script>")
             Exit Sub
         End If
 
-        Dim worNo As String = Request.QueryString("wor_no")
-        Dim npk As String = Session("npk") ' NPK user login
-        Dim rejectDate As String = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")
-
-        If String.IsNullOrEmpty(worNo) Or String.IsNullOrEmpty(npk) Then
+        If String.IsNullOrEmpty(worNo) OrElse String.IsNullOrEmpty(npk) Then
             Response.Write("<script>alert('Data tidak valid!');</script>")
             Exit Sub
         End If
 
-        Dim connStr As String = DecryptString(ConfigurationManager.ConnectionStrings("Conn").ToString())
+        Dim currentStatus As Integer = GetWorkOrderStatus(worNo)
+        Dim newStatus As Integer = 0
+        Dim levelLog As Integer = 0
+        Dim messageTitle As String = "Rejected!"
+        Dim messageText As String = "Work Order telah ditolak"
+        Dim messageIcon As String = "error"
+
+        ' Menentukan status dan level berdasarkan role dan status saat ini
+        If currentStatus = 1 AndAlso role = "atsreq" Then
+            newStatus = 7
+            levelLog = -2
+        ElseIf currentStatus = 4 AndAlso (role = "atstekSup" Or role = "atstekGS") Then
+            newStatus = 6
+            levelLog = -3
+        Else
+            Response.Write("<script>alert('Anda tidak memiliki akses untuk menolak permintaan ini.');</script>")
+            Exit Sub
+        End If
 
         Using conn As New SqlConnection(connStr)
             conn.Open()
             Dim transaction As SqlTransaction = conn.BeginTransaction()
 
             Try
-                ' Cek status approval dari tabel utama
-                Dim queryCheckStatus As String = "SELECT wor_status FROM t_workorder WHERE wor_no = @wor_no"
-                Dim status As Integer
+                ' Cek apakah user ini sudah pernah reject dengan level ini
+                Dim queryCheck As String = "SELECT COUNT(*) FROM t_detailworkorder WHERE dt_wor_no = @wor_no AND dt_createby = @npk AND dt_level = @levelLog"
+                Using cmdCheck As New SqlCommand(queryCheck, conn, transaction)
+                    cmdCheck.Parameters.AddWithValue("@wor_no", worNo)
+                    cmdCheck.Parameters.AddWithValue("@npk", npk)
+                    cmdCheck.Parameters.AddWithValue("@levelLog", levelLog)
+                    Dim count As Integer = Convert.ToInt32(cmdCheck.ExecuteScalar())
 
-                Using cmdCheckStatus As New SqlCommand(queryCheckStatus, conn, transaction)
-                    cmdCheckStatus.Parameters.AddWithValue("@wor_no", worNo)
-                    Dim result As Object = cmdCheckStatus.ExecuteScalar()
-                    status = If(result IsNot Nothing, Convert.ToInt32(result), -1)
+                    If count = 0 Then
+                        ' Insert log rejection
+                        Dim queryInsert As String = "INSERT INTO t_detailworkorder (dt_wor_no, dt_alasanreject, dt_createby, dt_createdate, dt_level) VALUES(@wor_no, @reason, @npk, @rejectDate, @levelLog)"
+                        Using cmdInsert As New SqlCommand(queryInsert, conn, transaction)
+                            cmdInsert.Parameters.AddWithValue("@wor_no", worNo)
+                            cmdInsert.Parameters.AddWithValue("@reason", rejectReason)
+                            cmdInsert.Parameters.AddWithValue("@npk", npk)
+                            cmdInsert.Parameters.AddWithValue("@rejectDate", rejectDate)
+                            cmdInsert.Parameters.AddWithValue("@levelLog", levelLog)
+                            cmdInsert.ExecuteNonQuery()
+                        End Using
+                    End If
                 End Using
 
-                ' Jika status sudah 2 (Approved), tidak bisa reject
-                If status = 2 Then
-                    Response.Write("<script>alert('Work Order sudah disetujui dan tidak dapat ditolak!');</script>")
-                    transaction.Rollback()
-                    conn.Close()
-                    Exit Sub
-                ElseIf status <> 1 Then
-                    Response.Write("<script>alert('Status tidak valid untuk ditolak!');</script>")
-                    transaction.Rollback()
-                    conn.Close()
-                    Exit Sub
-                End If
-
-                ' Simpan data ke tabel t_detailworkorder
-                Dim queryInsert As String = "INSERT INTO t_detailworkorder (dt_wor_no, dt_alasanreject, dt_createby, dt_createdate, dt_level) VALUES(@wor_no, @reason, @npk, GETDATE(), -1)"
-                Using cmdInsert As New SqlCommand(queryInsert, conn, transaction)
-                    cmdInsert.Parameters.AddWithValue("@wor_no", worNo)
-                    cmdInsert.Parameters.AddWithValue("@reason", rejectReason)
-                    cmdInsert.Parameters.AddWithValue("@npk", npk)
-                    cmdInsert.ExecuteNonQuery()
-                End Using
-
-                ' Update Status Work Order
-                Dim queryUpdate As String = "UPDATE t_workorder SET wor_status = 0 WHERE wor_no = @wor_no"
+                ' Update status Work Order
+                Dim queryUpdate As String = "UPDATE t_workorder SET wor_status = @newStatus WHERE wor_no = @wor_no"
                 Using cmdUpdate As New SqlCommand(queryUpdate, conn, transaction)
                     cmdUpdate.Parameters.AddWithValue("@wor_no", worNo)
+                    cmdUpdate.Parameters.AddWithValue("@newStatus", newStatus)
                     cmdUpdate.ExecuteNonQuery()
                 End Using
 
-                ' Commit transaksi
                 transaction.Commit()
 
-                ' Tampilkan SweetAlert jika berhasil
+                ' SweetAlert rejection success
                 Dim script As String = "<script>" & Environment.NewLine &
-               "Swal.fire({" & Environment.NewLine &
-               "    icon: 'error'," & Environment.NewLine &
-               "    title: 'Rejected!'," & Environment.NewLine &
-               "    text: 'Work Order telah ditolak'," & Environment.NewLine &
-               "    confirmButtonColor: '#d33'," & Environment.NewLine &
-               "    allowOutsideClick: false" & Environment.NewLine &
-               "}).then((result) => {" & Environment.NewLine &
-               "    if (result.isConfirmed) {" & Environment.NewLine &
-               "        window.location='ViewWorkOrder.aspx';" & Environment.NewLine &
-               "    }" & Environment.NewLine &
-               "});" & Environment.NewLine &
-               "</script>"
+                "Swal.fire({" & Environment.NewLine &
+                "    icon: '" & messageIcon & "'," & Environment.NewLine &
+                "    title: '" & messageTitle & "'," & Environment.NewLine &
+                "    text: '" & messageText & "'," & Environment.NewLine &
+                "    confirmButtonColor: '#d33'," & Environment.NewLine &
+                "    allowOutsideClick: false" & Environment.NewLine &
+                "}).then((result) => {" & Environment.NewLine &
+                "    if (result.isConfirmed) {" & Environment.NewLine &
+                "        window.location='ViewWorkOrder.aspx';" & Environment.NewLine &
+                "    }" & Environment.NewLine &
+                "});" & Environment.NewLine &
+                "</script>"
 
                 ClientScript.RegisterStartupScript(Me.GetType(), "rejectSuccess", script)
 
@@ -624,9 +676,51 @@ Partial Class DetailWorkOrder
         End Using
     End Sub
 
-    Protected Sub btnCancel_Click(ByVal sender As Object, ByVal e As EventArgs)
+    Protected Sub btnBack_Click(ByVal sender As Object, ByVal e As EventArgs)
         Response.Redirect("ViewWorkOrder.aspx")
     End Sub
+
+    Private Sub SetStatusBadge(worStatus As Integer)
+        Dim statusText As String = GetStatusText(worStatus)
+        Dim statusStyle As String = GetStatusStyle(worStatus)
+
+        ' Gunakan style inline agar tampil berwarna sesuai fungsi kamu
+        Dim badgeHtml As String = "<span style=""" & statusStyle & " padding:4px 10px; border-radius:12px;"">" & statusText & "</span>"
+
+        litBadgeStatus.Text = badgeHtml
+    End Sub
+
+    Public Function GetStatusText(ByVal statusID As Object) As String
+        If IsDBNull(statusID) Then Return ""
+
+        Select Case Convert.ToInt32(statusID)
+            Case 1 : Return "Waiting Approval"
+            Case 2 : Return "Need Response"
+            Case 3 : Return "On Progress"
+            Case 4 : Return "Waiting Approval by Kasie Technician"
+            Case 5 : Return "Done"
+            Case 6 : Return "Rejected by Kasie Technician"
+            Case 7 : Return "Rejected by Kasie Req"
+            Case 0 : Return "Canceled"
+            Case Else : Return "Unknown"
+        End Select
+    End Function
+
+    Public Function GetStatusStyle(ByVal statusID As Object) As String
+        If IsDBNull(statusID) Then Return "background-color:#FFFFFF; color:#000000; font-weight:bold; text-align:center;"
+
+        Select Case Convert.ToInt32(statusID)
+            Case 1 : Return "background-color:#ffebd3; color:#ffa93f; font-weight:bold; text-align:center;" ' Oranye
+            Case 2 : Return "background-color:#FED7D4; color:#f94131; font-weight:bold; text-align:center;" ' Merah
+            Case 3 : Return "background-color:#fffbcc; color:#ffea08; font-weight:bold; text-align:center;" ' Kuning
+            Case 4 : Return "background-color:#ffebd3; color:#2aa847; font-weight:bold; text-align:center;" ' Oranye, Hijau tua
+            Case 5 : Return "background-color:#d4edda; color:#2aa847; font-weight:bold; text-align:center;" ' Hijau
+            Case 6 : Return "background-color:#B0C4DE; color:#000080; font-weight:bold; text-align:center;" ' Biru abu-abu
+            Case 7 : Return "background-color:#D3D3D3; color:#000000; font-weight:bold; text-align:center;" ' Abu-abu
+            Case 0 : Return "background-color:#D3D3D3; color:#000000; font-weight:bold; text-align:center;" ' Abu-abu
+            Case Else : Return "background-color:#FFFFFF; color:#000000; font-weight:bold; text-align:center;" ' Default (Putih)
+        End Select
+    End Function
 
     Private Sub SetActiveButton(ByVal worNo As String)
         If worNo.StartsWith("BM") Then

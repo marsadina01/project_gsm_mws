@@ -206,11 +206,6 @@ Partial Class AddWorkOrder
                 Dim filePath As String = Path.Combine(folderPath, fileName)
                 Try
                     fuLampiran.SaveAs(filePath)
-                    'If File.Exists(filePath) Then
-                    '    Response.Write("<script>alert('File berhasil disimpan di: " & filePath & "');</script>")
-                    'Else
-                    '    Response.Write("<script>alert('File gagal disimpan di: " & filePath & "');</script>")
-                    'End If
                 Catch ex As Exception
                     Response.Write("<script>alert('Error saat menyimpan file: " & ex.Message & "');</script>")
                 End Try
@@ -249,8 +244,6 @@ Partial Class AddWorkOrder
                     cmd.Parameters.AddWithValue("@WorCreateBy", worCreateBy)
                     cmd.Parameters.AddWithValue("@WorCreateDate", worCreateDate)
                     cmd.Parameters.AddWithValue("@WorLampiran", worLampiran)
-                    Response.Write("<script>alert('Nama file yang akan disimpan: " & worLampiran & "');</script>")
-
 
                     conn.Open()
                     cmd.ExecuteNonQuery()
@@ -258,7 +251,21 @@ Partial Class AddWorkOrder
                 End Using
             End Using
 
-            Response.Write("<script>alert('Work Order berhasil disimpan!'); window.location='ViewWorkOrder.aspx';</script>")
+            Dim script As String = "<script>" & Environment.NewLine &
+                       "Swal.fire({" & Environment.NewLine &
+                       "    icon: 'success'," & Environment.NewLine &
+                       "    title: 'Success!'," & Environment.NewLine &
+                       "    text: 'Data request berhasil ditambahkan'," & Environment.NewLine &
+                       "    confirmButtonColor: '#28a745'," & Environment.NewLine &
+                       "    allowOutsideClick: false" & Environment.NewLine &
+                       "}).then((result) => {" & Environment.NewLine &
+                       "    if (result.isConfirmed) {" & Environment.NewLine &
+                       "        window.location='ViewWorkOrder.aspx';" & Environment.NewLine &
+                       "    }" & Environment.NewLine &
+                       "});" & Environment.NewLine &
+                       "</script>"
+
+            ClientScript.RegisterStartupScript(Me.GetType(), "addnewSuccess", script)
         Catch ex As Exception
             Response.Write("<script>alert('Terjadi kesalahan: " & ex.Message.Replace("'", "\'") & "');</script>")
         End Try
