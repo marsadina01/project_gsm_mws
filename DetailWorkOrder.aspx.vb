@@ -1,4 +1,5 @@
-﻿Imports System.Data.SqlClient
+﻿Imports System.Data
+Imports System.Data.SqlClient
 Imports System.IO
 Imports System.Security.Cryptography
 
@@ -19,6 +20,8 @@ Partial Class DetailWorkOrder
             If Not String.IsNullOrEmpty(worNo) Then
                 SetActiveButton(worNo)
                 SetMoldToolLabel(worNo)
+                SetResponseTime(worNo)
+                SetCloseTime(worNo)
             End If
 
             LoadWorkOrderDetails()
@@ -715,8 +718,8 @@ Partial Class DetailWorkOrder
             Case 3 : Return "background-color:#fffbcc; color:#ffea08; font-weight:bold; text-align:center;" ' Kuning
             Case 4 : Return "background-color:#ffebd3; color:#2aa847; font-weight:bold; text-align:center;" ' Oranye, Hijau tua
             Case 5 : Return "background-color:#d4edda; color:#2aa847; font-weight:bold; text-align:center;" ' Hijau
-            Case 6 : Return "background-color:#B0C4DE; color:#000080; font-weight:bold; text-align:center;" ' Biru abu-abu
-            Case 7 : Return "background-color:#D3D3D3; color:#000000; font-weight:bold; text-align:center;" ' Abu-abu
+            Case 6 : Return "background-color:#f94131; color:#000000; font-weight:bold; text-align:center;"
+            Case 7 : Return "background-color:#f94131; color:#000000; font-weight:bold; text-align:center;"
             Case 0 : Return "background-color:#D3D3D3; color:#000000; font-weight:bold; text-align:center;" ' Abu-abu
             Case Else : Return "background-color:#FFFFFF; color:#000000; font-weight:bold; text-align:center;" ' Default (Putih)
         End Select
@@ -740,6 +743,52 @@ Partial Class DetailWorkOrder
         Else
             lblMoldLabel.Text = "Mold/Tool"
         End If
+    End Sub
+
+    Private Sub SetResponseTime(ByVal worNo As String)
+        Dim query As String = "EXEC sp_GetTotalResponseTime @dt_wor_no"
+
+        Using conn As New SqlClient.SqlConnection(connStr)
+            Using cmd As New SqlClient.SqlCommand(query, conn)
+                cmd.Parameters.AddWithValue("@dt_wor_no", worNo)
+
+                conn.Open()
+
+                Dim result As Object = cmd.ExecuteScalar()
+
+                If result IsNot Nothing AndAlso result IsNot DBNull.Value Then
+                    Dim responseTime As String = result.ToString()
+
+                    ' Tulis format HTML ke Label
+                    lblrestime.Text = "Res Time : <span>" & responseTime & "</span>"
+                Else
+                    lblrestime.Text = "Res Time : <span>00:00:00</span>"
+                End If
+            End Using
+        End Using
+    End Sub
+
+    Private Sub SetCloseTime(ByVal worNo As String)
+        Dim query As String = "EXEC sp_GetTotalCloseTime @dt_wor_no"
+
+        Using conn As New SqlClient.SqlConnection(connStr)
+            Using cmd As New SqlClient.SqlCommand(query, conn)
+                cmd.Parameters.AddWithValue("@dt_wor_no", worNo)
+
+                conn.Open()
+
+                Dim result As Object = cmd.ExecuteScalar()
+
+                If result IsNot Nothing AndAlso result IsNot DBNull.Value Then
+                    Dim closeTime As String = result.ToString()
+
+                    ' Tulis format HTML ke Label
+                    lblclosetime.Text = "Close Time : <span>" & closeTime & "</span>"
+                Else
+                    lblclosetime.Text = "Close Time : <span>00:00:00</span>"
+                End If
+            End Using
+        End Using
     End Sub
 
     ' Fungsi untuk mendekripsi string koneksi database
