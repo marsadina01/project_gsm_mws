@@ -141,7 +141,7 @@
                                             <asp:ListItem Text="On Progress" Value="3"></asp:ListItem>
                                             <asp:ListItem Text="Waiting Approval by Technical Superior" Value="4"></asp:ListItem>
                                             <asp:ListItem Text="Done" Value="5"></asp:ListItem>
-                                            <asp:ListItem Text="Cancelled" Value="0"></asp:ListItem>
+                                            <asp:ListItem Text="Canceled" Value="0"></asp:ListItem>
                                         </asp:DropDownList>
                                     </div>
                                 </div>
@@ -224,6 +224,37 @@
                                                                 $.ajax({
                                                                     type: "POST",
                                                                     url: "ViewWorkOrder.aspx/OnResponse",
+                                                                    data: JSON.stringify({ worNo: worNo }),
+                                                                    contentType: "application/json; charset=utf-8",
+                                                                    dataType: "json",
+                                                                    success: function (response) {
+                                                                        Swal.fire("Sukses", response.d, "success").then(() => {
+                                                                            location.reload();
+                                                                        });
+                                                                    },
+                                                                    error: function (xhr, status, error) {
+                                                                        Swal.fire("Error", "Terjadi kesalahan: " + xhr.responseText, "error");
+                                                                    }
+                                                                });
+                                                            }
+                                                        });
+                                                    }
+
+                                                    function cancelWorkOrder(worNo) {
+                                                        Swal.fire({
+                                                            title: "Apakah Anda ingin membatalkan WO ini?",
+                                                            text: "no WO: " + worNo,
+                                                            icon: "question",
+                                                            showCancelButton: true,
+                                                            confirmButtonColor: "#3085d6",
+                                                            cancelButtonColor: "#d33",
+                                                            confirmButtonText: "Ya, Lanjutkan",
+                                                            cancelButtonText: "Batal"
+                                                        }).then((result) => {
+                                                            if (result.isConfirmed) {
+                                                                $.ajax({
+                                                                    type: "POST",
+                                                                    url: "ViewWorkOrder.aspx/OnCancel",
                                                                     data: JSON.stringify({ worNo: worNo }),
                                                                     contentType: "application/json; charset=utf-8",
                                                                     dataType: "json",

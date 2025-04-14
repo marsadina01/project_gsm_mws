@@ -19,10 +19,11 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/js/all.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 
 
     <script type="text/javascript">
-
         function showRejectReason() {
                     Swal.fire({
                         title: 'Masukkan alasan reject',
@@ -67,10 +68,41 @@
             document.getElementById("rejectPopup").style.display = "none";
         }
 
+
         function showLampiranModal(fileUrl) {
-            document.getElementById("iframeLampiran").src = fileUrl;
-            $("#lampiranModal").modal("show");
+            document.getElementById('iframeLampiran').src = fileUrl;
+            document.getElementById('uploadForm').style.display = 'none';
+            $('#lampiranModal').modal('show');
         }
+
+        function showUploadForm() {
+            document.getElementById('uploadForm').style.display = 'block';
+        }
+
+        function toggleUploadBox() {
+            var uploadBox = document.getElementById("uploadBox");
+            uploadBox.style.display = (uploadBox.style.display === "none" || uploadBox.style.display === "") ? "block" : "none";
+        }
+
+        // Drag & Drop Event
+        document.getElementById("uploadArea").addEventListener("dragover", function (e) {
+            e.preventDefault();
+            this.style.background = "#e9ecef";
+        });
+
+        document.getElementById("uploadArea").addEventListener("dragleave", function (e) {
+            this.style.background = "#fff";
+        });
+
+        document.getElementById("uploadArea").addEventListener("drop", function (e) {
+            e.preventDefault();
+            this.style.background = "#fff";
+            alert("File siap diunggah!");
+        });
+
+        document.getElementById("fileInput").addEventListener("change", function () {
+            alert("File dipilih: " + this.files[0].name);
+        });
 
     </script>
 
@@ -205,6 +237,21 @@
             color: #333;
         }
 
+        .btn-secondary-outline {
+          color: #6c757d; /* Warna teks sesuai btn-secondary */
+          background-color: transparent;
+          border: 2px solid #6c757d; /* Outline sesuai warna btn-secondary */
+          padding: 0.375rem 0.75rem;
+          font-size: 1rem;
+          border-radius: 0.25rem;
+          transition: all 0.3s ease-in-out;
+        }
+
+        .btn-secondary-outline:hover {
+          background-color: #6c757d;
+          color: #fff;
+        }
+
         .h-100 {
             height: 100%;
         }
@@ -214,11 +261,53 @@
             overflow-y: auto;
         }
 
+/*<<<<<<< HEAD
         .badge {
             font-size: 0.875rem;
             padding: 6px 12px;
             font-weight: 500;
             border-radius: 12px;
+        }
+
+=======*/
+        .d-flex {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+        }
+
+        asp\:Literal {
+            white-space: nowrap; /* Mencegah elemen melompat ke baris berikutnya */
+        }
+
+        /* Menambahkan margin atas pada form group */
+        .form-group {
+            margin-top: 20px; /* Menambah jarak atas untuk alasan reject */
+        }
+
+        /* Menambahkan margin bawah pada TextBox */
+        .form-group .form-control {
+            margin-bottom: 10px;
+        }
+
+                .upload-area {
+            border: 2px dashed #007bff;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+        }
+
+        .upload-area:hover {
+            background: #f1f1f1;
+        }
+
+        .upload-icon {
+            display: inline-block;
+            padding: 10px;
+            color: #007bff;
+            font-size: 18px;
+            cursor: pointer;
         }
 
 
@@ -245,7 +334,7 @@
                     <div class="box">
                         <div class="box-body">
                             <h4 class="box-title"><strong>Information</strong></h4>
-                            <table class="table table-borderless">
+                            <table class="table">
                                 <tr>
                                     <td>Requestor</td>
                                     <td><asp:Label ID="lblrequestor" runat="server"></asp:Label></td>
@@ -267,10 +356,11 @@
                 <div class="col-md-6">
                     <div class="box h-100">
                         <div class="box-body fixed-height">
-                            <h4 class="box-title d-flex justify-content-between align-items-center">
-                                <span><strong>Timeline</strong></span>
+
+                            <div class="d-flex justify-content-between align-items-center w-100">
+                                <h4 class="box-title m-0"><strong>Timeline</strong></h4>
                                 <asp:Literal ID="litBadgeStatus" runat="server" />
-                            </h4>
+                            </div>
                             <hr />
                             <ul class="timeline">
                                 <asp:Literal ID="litTimeline" runat="server"></asp:Literal>
@@ -293,7 +383,7 @@
                     <div class="form-group row">
                         <label class="col-sm-3 col-form-label">Machine</label>
                         <div class="col-sm-9">
-                            <asp:DropDownList ID="ddlmachine" runat="server" class="form-control" disabled></asp:DropDownList>
+                            <asp:DropDownList ID="ddlmachine" runat="server" class="form-control" Enabled="false"></asp:DropDownList>
                         </div>
                     </div>
                     <div class="form-group text-center">
@@ -304,19 +394,19 @@
                     <div class="form-group row">
                         <label class="col-sm-3 col-form-label">Mold / Tooling</label>
                         <div class="col-sm-9">
-                            <asp:DropDownList ID="ddlMoldTool" runat="server" class="form-control" disabled></asp:DropDownList>
+                            <asp:DropDownList ID="ddlMoldTool" runat="server" class="form-control" Enabled="false"></asp:DropDownList>
                         </div>
                     </div>
                     <div class="form-group row">
                         <label class="col-sm-3 col-form-label">Gejala Kerusakkan</label>
                         <div class="col-sm-9">
-                            <asp:TextBox ID="txtkerusakan" runat="server" class="form-control" disabled></asp:TextBox>
+                            <asp:TextBox ID="txtkerusakan" runat="server" class="form-control" Enabled="false"></asp:TextBox>
                         </div>
                     </div>
                     <div class="form-group row">
                         <label class="col-sm-3 col-form-label">Additional Note</label>
                         <div class="col-sm-9">
-                            <asp:TextBox ID="txtketerangan" runat="server" class="form-control" disabled></asp:TextBox>
+                            <asp:TextBox ID="txtketerangan" runat="server" class="form-control" Enabled="false"></asp:TextBox>
                         </div>
                     </div>
 
@@ -341,28 +431,37 @@
                         <tr>
                             <th>Jumlah Stok</th>
                             <td>
-                                <asp:TextBox ID="txtStok" runat="server" CssClass="form-control" disabled TextMode="Number"></asp:TextBox>
+                                <asp:TextBox ID="txtStok" runat="server" CssClass="form-control" Enabled="false" TextMode="Number"></asp:TextBox>
                             </td>
                         </tr>
                         <tr>
                             <th>Total Order</th>
                             <td>
-                                <asp:TextBox ID="txtTotalOrder" runat="server" CssClass="form-control" disabled TextMode="Number"></asp:TextBox>
+                                <asp:TextBox ID="txtTotalOrder" runat="server" CssClass="form-control" Enabled="false" TextMode="Number"></asp:TextBox>
 
                             </td>
                         </tr>
                         <tr>
                             <th>Tgl Produksi Dibutuhkan</th>
                             <td>
-                                <asp:TextBox ID="txtTglProduksi" runat="server" CssClass="form-control" disabled></asp:TextBox>
+                                <asp:TextBox ID="txtTglProduksi" runat="server" CssClass="form-control" Enabled="false"></asp:TextBox>
 
                             </td>
                         </tr>
                     </table>
+                            <!-- Menampilkan alasan reject yang tidak bisa diedit -->
+                    <div class="form-group row mt-3">
+                        <label ID="LabelRejectReason" runat="server" class="col-sm-3 col-form-label">Alasan Reject</label>
+                        <div class="col-sm-9">
+                            <asp:TextBox ID="TetxtRejectReason" runat="server" class="form-control" disabled></asp:TextBox>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <div class="box box-info">
+
+
+            <div class="box">
                 <div class="box-body text-left">
                     <asp:HyperLink ID="lnkLampiran" runat="server" onClick="showLampiranModal" CssClass="btn lampiran-btn" Visible="false">
                         Lihat Lampiran
@@ -380,9 +479,42 @@
                                 <span aria-hidden="true">&times;</span>
                             </button>
                         </div>
+            
                         <div class="modal-body text-center">
+                            <!-- Preview Lampiran -->
                             <iframe id="iframeLampiran" style="width:100%; height:500px; border:none;"></iframe>
+
+                            <!-- Tombol edit -->
+                            <asp:Button ID="btnEditLampiran" runat="server" Text="Edit Lampiran" CssClass="btn btn-warning mt-3" OnClientClick="showUploadForm(); return false;" />
+
+                            <!-- Upload ulang file -->
+                            <div id="uploadForm" style="display:none;" class="mt-3">
+                                <asp:FileUpload ID="fuLampiranBaru" runat="server" />
+                                <asp:Button ID="btnUploadLampiranBaru" runat="server" Text="Upload Ulang" CssClass="btn btn-success" OnClick="btnUploadLampiranBaru_Click" />
+                                <br />
+                                <asp:Label ID="lblMessageBaru" runat="server" CssClass="d-block mt-2 text-danger" />
+                            </div>
                         </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="box">
+                <div class="box-header">
+                    <div class="form-group">
+                        <asp:Button ID="btnLampiran" runat="server" class="btn btn-secondary" Text="Lampiran WO" OnClientClick="toggleUploadBox(); return false;" />
+                    </div>
+                </div>
+
+                <!-- Box Body (Awalnya Tersembunyi) -->
+                <div class="box-body" id="uploadBox" style="display: none;">
+                    <div class="upload-area" id="uploadArea">
+                        <label for="fileInput" class="upload-icon">
+                        </label>
+                        <input type="file" id="fileInput" style="display: none;" />
+                        <asp:FileUpload ID="fuLampiran" runat="server" />
+<%--                        <asp:Button ID="btnUpload" runat="server" Text="Upload File" OnClick="btnUpload_Click" CssClass="btn btn-primary" />--%>
+                        <asp:Label ID="lblMessage" runat="server" ForeColor="Red"></asp:Label>
                     </div>
                 </div>
             </div>
@@ -395,8 +527,11 @@
                     OnClientClick="return showRejectReason();"
                     OnClick="btnReject_Click" />
                 <asp:Button ID="btnApprove" runat="server" class="btn btn-success" Text="Approve" OnClick="btnApprove_Click" />
-                <asp:Button ID="btnCancel" runat="server" class="btn btn-danger" Text="Back" OnClick="btnCancel_Click" />
+                <asp:Button ID="btnBack" runat="server" class="btn btn-secondary-outline" Text="Back" OnClick="btnBack_Click" />
                 <asp:Button ID="btnClose" runat="server" CssClass="btn btn-primary" Text="Close WO" OnClick="btnClose_Click" />
+                <asp:Button ID="btnUpdate" runat="server" CssClass="btn btn-success" Text="Update" Onclick="btnUpdate_Click" />
+<%--                <asp:Label ID="lblDebug" runat="server" ForeColor="Red" />--%>
+
             </div>
 
             <asp:HiddenField ID="hdnRejectReason" runat="server" />
@@ -407,16 +542,10 @@
         <h4>Alasan Reject</h4>
         <asp:TextBox ID="txtRejectReason" runat="server" CssClass="form-control" TextMode="MultiLine"></asp:TextBox>
         <div class="text-right mt-3">
-            <asp:Button ID="btnSubmitReject" runat="server" class="btn btn-danger" Text="Submit" OnClick="btnReject_Click" />
+            <asp:Button ID="btnSubmitReject" runat="server" CssClass="btn btn-danger" Text="Submit" OnClick="btnReject_Click" />
             <button type="button" class="btn btn-secondary" onclick="closeRejectPopup();">Cancel</button>
         </div>
     </div>
-
-    <script>
-        function closeRejectPopup() {
-            document.getElementById("rejectPopup").style.display = "none";
-        }
-    </script>
 
     <!-- Bootstrap -->
     <script src="bower_components/bootstrap/dist/js/bootstrap.min.js"></script>

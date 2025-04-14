@@ -1,4 +1,5 @@
-﻿Imports System.Data.SqlClient
+﻿Imports System.Data
+Imports System.Data.SqlClient
 Imports System.IO
 Imports System.Security.Cryptography
 
@@ -7,12 +8,15 @@ Partial Class DetailWorkOrder
 
     Dim connStr As String = DecryptString(ConfigurationManager.ConnectionStrings("Conn").ToString())
 
+    Private hasRejectReason As Boolean = False
+
     Protected Sub Page_Load(ByVal sender As Object, ByVal e As EventArgs) Handles Me.Load
         If Session("name") Is Nothing Then
             Response.Redirect("default.aspx")
         End If
 
         If Not IsPostBack Then
+
             Dim worNo As String = Request.QueryString("wor_no")
 
             ' Tentukan tombol berdasarkan wor_no
@@ -26,10 +30,34 @@ Partial Class DetailWorkOrder
             LoadMoldToolDropdown()
             LoadUploadedFiles()
             LoadTimeline()
+            LoadRejectReason()
+
 
             ' Cek status Work Order dari database
             Dim worStatus As Integer = GetWorkOrderStatus(worNo)
             SetStatusBadge(worStatus)
+
+
+            ' Tampilkan tombol Edit Lampiran hanya jika status 6 atau 7
+            btnEditLampiran.Visible = (worStatus = 6 Or worStatus = 7)
+
+            ' Default: semua tetap disable
+            EnableFormControls(False)
+
+
+            ' Jika statusnya 6 atau 7, atau jika ada dt_level -2 atau -3, aktifkan input
+            If worStatus = 6 Or worStatus = 7 Then
+                EnableFormControls(True)
+                btnUpdate.Visible = True
+            Else
+                btnUpdate.Visible = False
+            End If
+
+            ' Tambahan logika untuk menyembunyikan btnUpdate kalau atsreq dan ada reject
+            If Session("role") = "atsreq" AndAlso hasRejectReason Then
+                btnUpdate.Visible = False
+            End If
+
 
             If worStatus = 1 Then
                 If Session("role") = "atsreq" Then
@@ -38,16 +66,27 @@ Partial Class DetailWorkOrder
                     fclose.Visible = False
                     btnApprove.Visible = True
                     btnReject.Visible = True
-                    btnCancel.Visible = False
+                    btnBack.Visible = False
                     btnClose.Visible = False
+                    btnUpdate.Visible = False
+                ElseIf Session("role") = "requester" Then
+                    detail1.Visible = True
+                    detail2.Visible = False
+                    fclose.Visible = False
+                    btnApprove.Visible = False
+                    btnReject.Visible = False
+                    btnBack.Visible = False
+                    btnClose.Visible = False
+                    btnUpdate.Visible = True ' requester bisa update/upload
                 Else
                     detail1.Visible = False
                     detail2.Visible = True
                     fclose.Visible = False
                     btnApprove.Visible = False
                     btnReject.Visible = False
-                    btnCancel.Visible = True
+                    btnBack.Visible = True
                     btnClose.Visible = False
+                    btnUpdate.Visible = False
                 End If
 
             ElseIf worStatus = 3 Then
@@ -57,16 +96,20 @@ Partial Class DetailWorkOrder
                     fclose.Visible = True
                     btnApprove.Visible = False
                     btnReject.Visible = False
-                    btnCancel.Visible = True
+                    btnBack.Visible = True
                     btnClose.Visible = True
+                    btnUpdate.Visible = False
+                    btnLampiran.Visible = True
                 Else
                     detail1.Visible = False
                     detail2.Visible = True
                     fclose.Visible = False
                     btnApprove.Visible = False
                     btnReject.Visible = False
-                    btnCancel.Visible = True
+                    btnBack.Visible = True
                     btnClose.Visible = False
+                    btnUpdate.Visible = False
+                    btnLampiran.Visible = False
                 End If
 
             ElseIf worStatus = 4 Then
@@ -76,16 +119,18 @@ Partial Class DetailWorkOrder
                     fclose.Visible = True
                     btnApprove.Visible = True
                     btnReject.Visible = True
-                    btnCancel.Visible = False
+                    btnBack.Visible = False
                     btnClose.Visible = False
+                    btnUpdate.Visible = False
                 Else
                     detail1.Visible = False
                     detail2.Visible = True
                     fclose.Visible = True
                     btnApprove.Visible = False
                     btnReject.Visible = False
-                    btnCancel.Visible = True
+                    btnBack.Visible = True
                     btnClose.Visible = False
+                    btnUpdate.Visible = False
                 End If
 
             Else
@@ -94,11 +139,10 @@ Partial Class DetailWorkOrder
                 fclose.Visible = True
                 btnApprove.Visible = False
                 btnReject.Visible = False
-                btnCancel.Visible = True
+                btnBack.Visible = True
                 btnClose.Visible = False
             End If
         Else
-            LoadWorkOrderDetails()
             LoadMachineDropdown()
             LoadMoldToolDropdown()
             LoadUploadedFiles()
@@ -106,17 +150,43 @@ Partial Class DetailWorkOrder
 
         End If
     End Sub
+    Private Sub EnableFormControls(enable As Boolean)
+        ' Default disable semua kontrol
+        txtrequestor.Enabled = False
+        txtkerusakan.Enabled = False
+        txtketerangan.Enabled = False
+        chkRepairBy.Enabled = False
+        txtStok.Enabled = False
+        txtTotalOrder.Enabled = False
+        txtTglProduksi.Enabled = False
+        txtanalisa.Enabled = False
+        txtperbaikan.Enabled = False
 
-    Private Sub SetActiveButton(ByVal worNo As String)
-        If worNo.StartsWith("BM") Then
-            btnMold.CssClass = "btn btn-outline-primary mx-2 custom-dark-btn active-btn"
-            btnTool.CssClass = "btn btn-outline-primary mx-2 custom-dark-btn"
-        ElseIf worNo.StartsWith("BT") Then
-            btnTool.CssClass = "btn btn-outline-primary mx-2 custom-dark-btn active-btn"
-            btnMold.CssClass = "btn btn-outline-primary mx-2 custom-dark-btn"
+        ' Mengambil role pengguna dari session
+        Dim role As String = Session("role")
+        Dim worStatus As Integer = GetWorkOrderStatus(Request.QueryString("wor_no"))
+
+        ' Mengaktifkan kontrol form sesuai dengan role dan status
+        If role = "requester" Then
+            ' Jika role adalah requester
+            If worStatus = 7 Or worStatus = 1 Then
+                ' Jika status 7, hanya izinkan pengeditan untuk requester
+                txtkerusakan.Enabled = True
+                txtketerangan.Enabled = True
+                chkRepairBy.Enabled = True
+                txtStok.Enabled = True
+                txtTotalOrder.Enabled = True
+                txtTglProduksi.Enabled = True
+            End If
+        ElseIf role = "teknisiSup" Or role = "teknisiGS" Then
+            ' Jika role adalah teknisi
+            If worStatus = 3 Or worStatus = 6 Then
+                ' Jika status 6, hanya izinkan pengeditan untuk teknisi
+                txtanalisa.Enabled = True
+                txtperbaikan.Enabled = True
+            End If
         End If
     End Sub
-
     Private Function GetWorkOrderStatus(ByVal worNo As String) As Integer
         Dim status As Integer = 0
 
@@ -175,6 +245,55 @@ Partial Class DetailWorkOrder
                 End Try
             End Using
         End Using
+    End Sub
+
+    ' Load Alasan Reject dari database
+    Private Sub LoadRejectReason()
+        Dim worNo As String = Request.QueryString("wor_no")
+        hasRejectReason = False ' Default
+
+        ' Pastikan worNo valid dan data ada di database
+        If String.IsNullOrEmpty(worNo) Then
+            Response.Write("<script>alert('Work Order Number tidak ditemukan!');</script>")
+            Exit Sub
+        End If
+
+        ' Query untuk mengambil alasan reject berdasarkan worNo dan level -2 atau -3
+        Dim query As String = "SELECT dt_alasanreject FROM t_detailworkorder WHERE dt_wor_no = @wor_no AND (dt_level = -2 OR dt_level = -3)"
+
+        Using conn As New SqlConnection(connStr)
+            Using cmd As New SqlCommand(query, conn)
+                cmd.Parameters.AddWithValue("@wor_no", worNo)
+                Try
+                    conn.Open()
+                    Dim reader As SqlDataReader = cmd.ExecuteReader()
+
+                    If reader.HasRows Then
+                        hasRejectReason = True ' ← Di sini ditandai kalau ada reject reason
+                        While reader.Read()
+                            Dim level As Integer = reader("dt_level")
+                            Dim reason As String = If(IsDBNull(reader("dt_alasanreject")), "", reader("dt_alasanreject").ToString())
+
+                            If level = -2 OrElse level = -3 Then
+                                TetxtRejectReason.Text = reason
+                            End If
+                        End While
+                    Else
+                        TetxtRejectReason.Text = ""
+                    End If
+                Catch ex As Exception
+                    'Response.Write("<script>alert('Error: " & ex.Message & "');</script>")
+                Finally
+                    conn.Close()
+                End Try
+            End Using
+        End Using
+
+        ' Kalau gak ada reject reason, sembunyikan textbox dan label
+        If Not hasRejectReason Then
+            TetxtRejectReason.Visible = False
+            LabelRejectReason.Visible = False
+        End If
     End Sub
 
 
@@ -367,9 +486,11 @@ Partial Class DetailWorkOrder
                                     Case 0
                                         statusText = "Work Order created"
                                     Case -1
-                                        statusText = "Rejected011532"
+                                        statusText = "Cancelled"
                                     Case -2
-                                        statusText = "Canceled the repair"
+                                        statusText = "Rejected"
+                                    Case -3
+                                        statusText = "Rejected the repair"
                                 End Select
 
                                 ' Tandai item terbaru dengan class "latest"
@@ -428,7 +549,7 @@ Partial Class DetailWorkOrder
             messageText = "Anda telah menyetujui hasil perbaikan dan Work Order telah selesai"
         ElseIf currentStatus = 1 Then
             ' Pastikan hanya role yang diizinkan bisa approve status awal
-            If Not (role = "atsreq" Or role = "adminmws") Then
+            If Not (role = "atsreq") Then
                 Response.Write("<script>alert('Anda tidak memiliki akses untuk menyetujui permintaan ini.');</script>")
                 Exit Sub
             End If
@@ -514,47 +635,6 @@ Partial Class DetailWorkOrder
         End Using
     End Sub
 
-    Private Sub SetStatusBadge(worStatus As Integer)
-        Dim statusText As String = GetStatusText(worStatus)
-        Dim statusStyle As String = GetStatusStyle(worStatus)
-
-        ' Gunakan style inline agar tampil berwarna sesuai fungsi kamu
-        Dim badgeHtml As String = "<span style=""" & statusStyle & " padding:4px 10px; border-radius:12px;"">" & statusText & "</span>"
-
-        litBadgeStatus.Text = badgeHtml
-    End Sub
-
-    Public Function GetStatusText(ByVal statusID As Object) As String
-        If IsDBNull(statusID) Then Return ""
-
-        Select Case Convert.ToInt32(statusID)
-            Case 1 : Return "Waiting Approval"
-            Case 2 : Return "Need Response"
-            Case 3 : Return "On Progress"
-            Case 4 : Return "Waiting Approval by Technical Superior"
-            Case 5 : Return "Done"
-            Case 6 : Return "Rejected by Kasie Technician"
-            Case 7 : Return "Rejected by Kasie Req"
-            Case 0 : Return "Cancelled"
-            Case Else : Return "Unknown"
-        End Select
-    End Function
-
-    Public Function GetStatusStyle(ByVal statusID As Object) As String
-        If IsDBNull(statusID) Then Return "background-color:#FFFFFF; color:#000000; font-weight:bold; text-align:center;"
-
-        Select Case Convert.ToInt32(statusID)
-            Case 1 : Return "background-color:#ffebd3; color:#ffa93f; font-weight:bold; text-align:center;" ' Oranye
-            Case 2 : Return "background-color:#FED7D4; color:#f94131; font-weight:bold; text-align:center;" ' Merah
-            Case 3 : Return "background-color:#fffbcc; color:#ffea08; font-weight:bold; text-align:center;" ' Kuning
-            Case 4 : Return "background-color:#ffebd3; color:#2aa847; font-weight:bold; text-align:center;" ' Oranye, Hijau tua
-            Case 5 : Return "background-color:#d4edda; color:#2aa847; font-weight:bold; text-align:center;" ' Hijau
-            Case 0 : Return "background-color:#D3D3D3; color:#000000; font-weight:bold; text-align:center;" ' Abu-abu
-            Case 6 : Return "background-color:#B0C4DE; color:#000080; font-weight:bold; text-align:center;" ' Biru abu-abu
-            Case Else : Return "background-color:#FFFFFF; color:#000000; font-weight:bold; text-align:center;" ' Default (Putih)
-        End Select
-    End Function
-
     ' Fungsi untuk menangani tombol Reject
     Protected Sub btnReject_Click(ByVal sender As Object, ByVal e As EventArgs) Handles btnReject.Click
         Dim worNo As String = Request.QueryString("wor_no")
@@ -588,7 +668,6 @@ Partial Class DetailWorkOrder
             newStatus = 6
             levelLog = -3
         Else
-            Response.Write("<script>alert('Anda tidak memiliki akses untuk menolak permintaan ini.');</script>")
             Exit Sub
         End If
 
@@ -643,7 +722,6 @@ Partial Class DetailWorkOrder
                "    }" &
                "});" &
                "</script>"
-
                 ClientScript.RegisterStartupScript(Me.GetType(), "rejectSuccess", script)
 
             Catch ex As Exception
@@ -661,6 +739,47 @@ Partial Class DetailWorkOrder
         Dim approveDate As String = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")
         Dim txtanalisa As TextBox = TryCast(Master.FindControl("ContentPlaceHolder1").FindControl("txtanalisa"), TextBox)
         Dim txtperbaikan As TextBox = TryCast(Master.FindControl("ContentPlaceHolder1").FindControl("txtperbaikan"), TextBox)
+        Dim worLmapiranwo As String = ""
+
+        ' Jika ada file yang dipilih
+        If fuLampiran.HasFile Then
+            Dim folderPath As String = Server.MapPath("~/Uploads/")
+
+            ' Buat folder jika belum ada
+            If Not Directory.Exists(folderPath) Then
+                Directory.CreateDirectory(folderPath)
+            End If
+
+            ' Ambil ekstensi file asli (huruf kecil untuk validasi)
+            Dim fileExtension As String = Path.GetExtension(fuLampiran.FileName).ToLower()
+
+            ' Daftar ekstensi yang diperbolehkan
+            Dim allowedExtensions As String() = {".jpg", ".jpeg", ".png", ".pdf"}
+
+            ' Cek apakah file yang diupload masuk dalam daftar yang diperbolehkan
+            If allowedExtensions.Contains(fileExtension) Then
+                ' Buat format nama file: MWS_YYYYMMDD_no_wor.ext
+                Dim numWor As String = worNo.Replace("/", "_")
+                Dim fileName As String = "MWS_" & DateTime.Now.ToString("yyyyMMdd") & "_" & numWor & fileExtension
+                Dim filePath As String = Path.Combine(folderPath, fileName)
+                Try
+                    fuLampiran.SaveAs(filePath)
+                Catch ex As Exception
+                    Response.Write("<script>alert('Error saat menyimpan file: " & ex.Message & "');</script>")
+                End Try
+
+                ' Simpan file ke folder
+                fuLampiran.SaveAs(filePath)
+
+                ' Simpan nama file ke variabel untuk database
+                worLmapiranwo = fileName
+            Else
+                ' Jika jenis file tidak diperbolehkan, tampilkan alert dan hentikan proses
+                Response.Write("<script>alert('Format file tidak diperbolehkan! Hanya JPG, PNG, dan PDF yang bisa diupload.');</script>")
+                Exit Sub
+            End If
+
+        End If
 
         ' Validasi: Pastikan analisa dan perbaikan diisi
         If String.IsNullOrEmpty(txtanalisa.Text.Trim()) OrElse String.IsNullOrEmpty(txtperbaikan.Text.Trim()) Then
@@ -698,11 +817,12 @@ Partial Class DetailWorkOrder
                 End Using
 
                 ' Update Status Work Order
-                Dim queryUpdate As String = "UPDATE t_workorder SET wor_status = 4, wor_analisa = @analisa, wor_perbaikan = @perbaikan WHERE wor_no = @wor_no"
+                Dim queryUpdate As String = "UPDATE t_workorder SET wor_status = 4, wor_analisa = @analisa, wor_perbaikan = @perbaikan, wor_lampiranwo = @lampiran WHERE wor_no = @wor_no"
                 Using cmdUpdate As New SqlCommand(queryUpdate, conn, transaction)
                     cmdUpdate.Parameters.AddWithValue("@wor_no", worNo)
                     cmdUpdate.Parameters.AddWithValue("@analisa", txtanalisa.Text.Trim())
                     cmdUpdate.Parameters.AddWithValue("@perbaikan", txtperbaikan.Text.Trim())
+                    cmdUpdate.Parameters.AddWithValue("@lampiran", worLmapiranwo)
                     cmdUpdate.ExecuteNonQuery()
                 End Using
 
@@ -732,8 +852,195 @@ Partial Class DetailWorkOrder
         End Using
     End Sub
 
-    Protected Sub btnCancel_Click(ByVal sender As Object, ByVal e As EventArgs)
+    Protected Sub btnBack_Click(ByVal sender As Object, ByVal e As EventArgs)
         Response.Redirect("ViewWorkOrder.aspx")
+    End Sub
+
+    Protected Sub btnUpdate_Click(sender As Object, e As EventArgs)
+        Dim worNo As String = Request.QueryString("wor_no")
+        Dim npk As String = Session("npk")
+        Dim role As String = Session("role")
+        Dim updateDate As String = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")
+        'ScriptManager.RegisterStartupScript(Me, Me.GetType(), "debug", "alert('wor_no: " & worNo & "\nrole: " & role & "\nnpk: " & npk & "');", True)
+
+        'lblDebug.Text = "Kerusakan: " & txtkerusakan.Text & " | Note: " & txtketerangan.Text & " | Analisa: " & txtanalisa.Text & " | Perbaikan: " & txtperbaikan.Text
+        Dim gejalaKerusakan As String = txtkerusakan.Text
+        Dim addNote As String = txtketerangan.Text
+        Dim repairBy As String = If(chkRepairBy.Checked, "GS", "Supplier")
+        Dim analisa As String = txtanalisa.Text
+        Dim perbaikan As String = txtperbaikan.Text
+        Dim jumlahStok As Integer = Convert.ToInt32(txtStok.Text)
+        Dim totalOrder As Integer = Convert.ToInt32(txtTotalOrder.Text)
+        Dim tglProduksiDibutuhkan As String = txtTglProduksi.Text
+
+        Dim currentStatus As Integer = GetWorkOrderStatus(worNo)
+        Dim newStatus As Integer = 0
+        Dim levelLog As Integer = 0
+
+        ' Menentukan status dan level berdasarkan role dan status saat ini
+        If (currentStatus = 1 Or currentStatus = 7) AndAlso role = "requester" Then
+            newStatus = 1
+            levelLog = 0
+        ElseIf currentStatus = 6 AndAlso (role = "teknisiSup" Or role = "teknisiGS") Then
+            newStatus = 4
+            levelLog = 3
+        Else
+            ScriptManager.RegisterStartupScript(Me, Me.GetType(), "alert", "alert('Tidak memenuhi kondisi status dan role');", True)
+            Exit Sub
+        End If
+
+        Using conn As New SqlConnection(connStr)
+            conn.Open()
+            Dim tran As SqlTransaction = conn.BeginTransaction()
+
+            Try
+                ' Query untuk update data work order
+                Dim updateQuery As String = "UPDATE t_workorder SET wor_damage = @kerusakan, wor_addnote = @note, wor_repairby = @repairBy, " &
+                                        "wor_analisa = @analisa, wor_perbaikan = @perbaikan, wor_status = @status, wor_stok = @stok, " &
+                                        "wor_total_order = @order, wor_tglproduksi = @tglProduksi WHERE wor_no = @worNo"
+                Using cmdUpdate As New SqlCommand(updateQuery, conn, tran)
+                    cmdUpdate.Parameters.AddWithValue("@kerusakan", gejalaKerusakan)
+                    cmdUpdate.Parameters.AddWithValue("@note", addNote)
+                    cmdUpdate.Parameters.AddWithValue("@repairBy", repairBy)
+                    cmdUpdate.Parameters.AddWithValue("@analisa", analisa)
+                    cmdUpdate.Parameters.AddWithValue("@perbaikan", perbaikan)
+                    cmdUpdate.Parameters.AddWithValue("@status", newStatus)
+                    cmdUpdate.Parameters.AddWithValue("@stok", jumlahStok)
+                    cmdUpdate.Parameters.AddWithValue("@order", totalOrder)
+                    cmdUpdate.Parameters.AddWithValue("@tglProduksi", tglProduksiDibutuhkan)
+                    cmdUpdate.Parameters.AddWithValue("@worNo", worNo)
+                    cmdUpdate.ExecuteNonQuery()
+                End Using
+
+                ' Insert ke t_detailworkorder untuk logging perubahan
+                Dim insertQuery As String = "INSERT INTO t_detailworkorder (dt_wor_no, dt_createby, dt_createdate, dt_level) " &
+                                        "VALUES (@worNo, @npk, @updateDate, @levelLog)"
+                Using cmdInsert As New SqlCommand(insertQuery, conn, tran)
+                    cmdInsert.Parameters.AddWithValue("@worNo", worNo)
+                    cmdInsert.Parameters.AddWithValue("@npk", npk)
+                    cmdInsert.Parameters.AddWithValue("@updateDate", updateDate)
+                    cmdInsert.Parameters.AddWithValue("@levelLog", levelLog)
+                    cmdInsert.ExecuteNonQuery()
+                End Using
+
+                tran.Commit()
+                Dim script As String = "Swal.fire({" & Environment.NewLine &
+               "    icon: 'success'," & Environment.NewLine &
+               "    title: 'Success!'," & Environment.NewLine &
+               "    text: 'Data request berhasil diupdate'," & Environment.NewLine &
+               "    confirmButtonColor: '#28a745'," & Environment.NewLine &
+               "    allowOutsideClick: false" & Environment.NewLine &
+               "}).then((result) => {" & Environment.NewLine &
+               "    if (result.isConfirmed) {" & Environment.NewLine &
+               "        window.location='ViewWorkOrder.aspx';" & Environment.NewLine &
+               "    }" & Environment.NewLine &
+               "});"
+
+                ScriptManager.RegisterStartupScript(Me, Me.GetType(), "updateSuccess", script, True)
+
+            Catch ex As Exception
+                tran.Rollback()
+                Dim pesanError As String = ex.Message.Replace("'", "").Replace(Environment.NewLine, " ")
+                ScriptManager.RegisterStartupScript(Me, Me.GetType(), "alert", "Swal.fire('Error', 'Kesalahan: " & pesanError & "', 'error');", True)
+                'lblDebug.Text = "ERROR: " & ex.Message
+            End Try
+        End Using
+    End Sub
+
+    Protected Sub btnUploadLampiranBaru_Click(sender As Object, e As EventArgs)
+        If fuLampiranBaru.HasFile Then
+            Dim allowedExtensions As String() = {".pdf", ".jpg", ".png"}
+            Dim extension As String = Path.GetExtension(fuLampiranBaru.FileName).ToLower()
+
+            If allowedExtensions.Contains(extension) Then
+                Dim fileName As String = Path.GetFileName(fuLampiranBaru.FileName)
+                Dim savePath As String = Server.MapPath("~/Uploads/") & fileName
+                fuLampiranBaru.SaveAs(savePath)
+
+                ' Update nama file di database
+                Dim worNo As String = Request.QueryString("wor_no")
+                Dim query As String = "UPDATE t_workorder SET wor_lampiran = @fileName WHERE wor_no = @wor_no"
+
+                Using conn As New SqlConnection(connStr)
+                    Using cmd As New SqlCommand(query, conn)
+                        cmd.Parameters.AddWithValue("@fileName", fileName)
+                        cmd.Parameters.AddWithValue("@wor_no", worNo)
+
+                        Try
+                            conn.Open()
+                            cmd.ExecuteNonQuery()
+                            lblMessageBaru.ForeColor = System.Drawing.Color.Green
+                            lblMessageBaru.Text = "Lampiran berhasil diperbarui."
+
+                            ' Update iframe tanpa reload halaman
+                            Dim script As String = "document.getElementById('lampiranFrame').src = '" & ResolveUrl("~/Uploads/" & fileName) & "';"
+                            ScriptManager.RegisterStartupScript(Me, Me.GetType(), "refreshIframe", script, True)
+
+                        Catch ex As Exception
+                            lblMessageBaru.Text = "Gagal update file: " & ex.Message
+                        Finally
+                            conn.Close()
+                        End Try
+                    End Using
+                End Using
+            Else
+                lblMessageBaru.Text = "File tidak valid. Hanya PDF, JPG, PNG."
+            End If
+        Else
+            lblMessageBaru.Text = "Silakan pilih file terlebih dahulu."
+        End If
+    End Sub
+
+    Private Sub SetStatusBadge(worStatus As Integer)
+        Dim statusText As String = GetStatusText(worStatus)
+        Dim statusStyle As String = GetStatusStyle(worStatus)
+
+        ' Gunakan style inline agar tampil berwarna sesuai fungsi kamu
+        Dim badgeHtml As String = "<span style=""" & statusStyle & " padding:4px 10px; border-radius:12px;"">" & statusText & "</span>"
+
+        litBadgeStatus.Text = badgeHtml
+    End Sub
+
+    Public Function GetStatusText(ByVal statusID As Object) As String
+        If IsDBNull(statusID) Then Return ""
+
+        Select Case Convert.ToInt32(statusID)
+            Case 1 : Return "Waiting Approval"
+            Case 2 : Return "Need Response"
+            Case 3 : Return "On Progress"
+            Case 4 : Return "Waiting Approval by Kasie Technician"
+            Case 5 : Return "Done"
+            Case 6 : Return "Rejected by Kasie Technician"
+            Case 7 : Return "Rejected by Kasie Req"
+            Case 0 : Return "Canceled"
+            Case Else : Return "Unknown"
+        End Select
+    End Function
+
+    Public Function GetStatusStyle(ByVal statusID As Object) As String
+        If IsDBNull(statusID) Then Return "background-color:#FFFFFF; color:#000000; font-weight:bold; text-align:center;"
+
+        Select Case Convert.ToInt32(statusID)
+            Case 1 : Return "background-color:#ffebd3; color:#ffa93f; font-weight:bold; text-align:center;" ' Oranye
+            Case 2 : Return "background-color:#FED7D4; color:#f94131; font-weight:bold; text-align:center;" ' Merah
+            Case 3 : Return "background-color:#fffbcc; color:#ffea08; font-weight:bold; text-align:center;" ' Kuning
+            Case 4 : Return "background-color:#ffebd3; color:#2aa847; font-weight:bold; text-align:center;" ' Oranye, Hijau tua
+            Case 5 : Return "background-color:#d4edda; color:#2aa847; font-weight:bold; text-align:center;" ' Hijau
+            Case 6 : Return "background-color:#B0C4DE; color:#000080; font-weight:bold; text-align:center;" ' Biru abu-abu
+            Case 7 : Return "background-color:#D3D3D3; color:#000000; font-weight:bold; text-align:center;" ' Abu-abu
+            Case 0 : Return "background-color:#D3D3D3; color:#000000; font-weight:bold; text-align:center;" ' Abu-abu
+            Case Else : Return "background-color:#FFFFFF; color:#000000; font-weight:bold; text-align:center;" ' Default (Putih)
+        End Select
+    End Function
+
+    Private Sub SetActiveButton(ByVal worNo As String)
+        If worNo.StartsWith("BM") Then
+            btnMold.CssClass = "btn btn-outline-primary mx-2 custom-dark-btn active-btn"
+            btnTool.CssClass = "btn btn-outline-primary mx-2 custom-dark-btn"
+        ElseIf worNo.StartsWith("BT") Then
+            btnTool.CssClass = "btn btn-outline-primary mx-2 custom-dark-btn active-btn"
+            btnMold.CssClass = "btn btn-outline-primary mx-2 custom-dark-btn"
+        End If
     End Sub
 
     Private Sub SetMoldToolLabel(ByVal worNo As String)

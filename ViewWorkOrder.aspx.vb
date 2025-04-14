@@ -66,6 +66,8 @@ Partial Class ViewWorkOrder
             MatSql += " AND w.wor_repairby = 'Supplier' AND w.wor_status <> 1 AND w.wor_status <> 2 AND w.wor_status <> 3 AND w.wor_status <> 0"
         ElseIf Session("role") = "atstekGS" Then
             MatSql += " AND w.wor_repairby = 'GS' AND w.wor_status <> 1 AND w.wor_status <> 2 AND w.wor_status <> 3 AND w.wor_status <> 0"
+        ElseIf Session("role") = "atsreq" Then
+            MatSql += " AND w.wor_status <> 0"
         End If
 
         ' Tambahkan parameter jika user melakukan filter
@@ -173,6 +175,52 @@ Partial Class ViewWorkOrder
         End Try
     End Function
 
+    <WebMethod()>
+    Public Shared Function OnCancel(ByVal worNo As String) As String
+        ' Cek apakah parameter kosong
+        If String.IsNullOrEmpty(worNo) Then
+            Return "Work Order tidak valid."
+        End If
+
+        Dim con As New SqlConnection(connStr)
+        Dim transaction As SqlTransaction = Nothing
+
+        Try
+            con.Open()
+            transaction = con.BeginTransaction()
+
+            ' Query 1: Update status di tabel t_workorder
+            Dim query1 As String = "UPDATE db_purchasing.dbo.t_workorder SET wor_status = 0, wor_responsedate = GETDATE() WHERE wor_no = @wor_no"
+
+            ' Query 2: Insert ke tabel t_detailworkorder
+            Dim query2 As String = "INSERT INTO db_purchasing.dbo.t_detailworkorder (dt_wor_no, dt_createby, dt_createdate, dt_level) VALUES (@wor_no, @npk, GETDATE(), -1)"
+
+            ' Eksekusi Query 1
+            Using cmd1 As New SqlCommand(query1, con, transaction)
+                cmd1.Parameters.AddWithValue("@wor_no", worNo)
+                cmd1.ExecuteNonQuery()
+            End Using
+
+            ' Eksekusi Query 2
+            Using cmd2 As New SqlCommand(query2, con, transaction)
+                cmd2.Parameters.AddWithValue("@wor_no", worNo)
+                cmd2.Parameters.AddWithValue("@npk", HttpContext.Current.Session("npk")) ' Ambil nilai NPK dari session
+                cmd2.ExecuteNonQuery()
+            End Using
+
+            ' Commit jika semua berhasil
+            transaction.Commit()
+            Return "WO telah dibatalkan."
+        Catch ex As Exception
+            ' Rollback jika ada error
+            If transaction IsNot Nothing Then
+                transaction.Rollback()
+            End If
+            Return "Terjadi kesalahan: " & ex.Message
+        Finally
+            con.Close()
+        End Try
+    End Function
 
     Public Function Get_EmptyDataTable() As DataTable
         Dim dtEmpty As New DataTable()
@@ -209,12 +257,18 @@ Partial Class ViewWorkOrder
         Dim status As String = worStatus.ToString()
         Dim workOrderNo As String = worNo.ToString()
         Dim buttons As String = ""
+        Dim role = Session("role")
 
         ' Pastikan status adalah angka valid
         If Not String.IsNullOrEmpty(status) AndAlso IsNumeric(status) Then
-            If status = "2" Then
+            If status = "2" AndAlso (role = "teknisiGS" OrElse role = "teknisiSup") Then
                 buttons &= "<button type='button' class='btn btn-danger btn-sm' title='Response' style='margin-right: 5px;' onclick='respondToWorkOrder(""" & workOrderNo & """)'>"
                 buttons &= "<i class='fa fa-deafness'></i></button>"
+            End If
+
+            If status = "1" AndAlso (role = "requester") Then
+                buttons &= "<button type='button' class='btn btn-danger btn-sm' title='Cancel' style='margin-right: 5px;' onclick='cancelWorkOrder(""" & workOrderNo & """)'>"
+                buttons &= "<i class='fa fa-close'></i></button>"
             End If
         End If
 
@@ -233,10 +287,11 @@ Partial Class ViewWorkOrder
             Case 1 : Return "Waiting Approval"
             Case 2 : Return "Need Response"
             Case 3 : Return "On Progress"
-            Case 4 : Return "Waiting Approval by Technical Superior"
+            Case 4 : Return "Waiting Approval by Kasie Technician"
             Case 5 : Return "Done"
             Case 6 : Return "Rejected by Kasie Technician"
-            Case 0 : Return "Rejected by Kasie Req"
+            Case 7 : Return "Rejected by Kasie Req"
+            Case 0 : Return "Canceled"
             Case Else : Return "Unknown"
         End Select
     End Function
@@ -250,12 +305,13 @@ Partial Class ViewWorkOrder
             Case 3 : Return "background-color:#fffbcc; color:#ffea08; font-weight:bold; text-align:center;" ' Kuning
             Case 4 : Return "background-color:#ffebd3; color:#2aa847; font-weight:bold; text-align:center;" ' Oranye, Hijau tua
             Case 5 : Return "background-color:#d4edda; color:#2aa847; font-weight:bold; text-align:center;" ' Hijau
+            Case 6 : Return "background-color:#B0C4DE; color:#000080; font-weight:bold; text-align:center;" ' Biru abu-abu
+            Case 7 : Return "background-color:#D3D3D3; color:#000000; font-weight:bold; text-align:center;" ' Abu-abu
             Case 0 : Return "background-color:#D3D3D3; color:#000000; font-weight:bold; text-align:center;" ' Abu-abu
             Case 6 : Return "background-color:#B0C4DE; color:#000080; font-weight:bold; text-align:center;" ' Biru abu-abu
             Case Else : Return "background-color:#FFFFFF; color:#000000; font-weight:bold; text-align:center;" ' Default (Putih)
         End Select
     End Function
-
 
     Public Shared Function DecryptString(ByVal encryptedString As String) As String
         Dim DES As New TripleDESCryptoServiceProvider
