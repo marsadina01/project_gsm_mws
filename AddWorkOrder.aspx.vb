@@ -170,6 +170,7 @@ Partial Class AddWorkOrder
         Dim worNo As String = ViewState("wor_no").ToString()
         Dim worSupplier As String = Session("nameinfor").ToString()
         Dim worDamage As String = txtKerusakan.Text.Trim()
+        Dim worDatashot As Integer = If(IsNumeric(txtDatashot.Text.Trim()), Convert.ToInt32(txtDatashot.Text.Trim()), 0)
         Dim worMoldTool As String = ddlMoldTool.SelectedValue
         Dim worMachine As String = ddlmachine.SelectedValue
         Dim worRepairBy As String = If(chkKirimGS.Checked, "GS", "Supplier")
@@ -226,13 +227,14 @@ Partial Class AddWorkOrder
         ' Simpan ke database
         Try
             Using conn As New SqlConnection(connStr)
-                Dim query As String = "INSERT INTO db_purchasing.dbo.t_workorder (wor_no, wor_supplier, wor_damage, wor_mold_tool, wor_machine, wor_repairby, wor_addnote, wor_stok, wor_total_order, wor_tglproduksi, wor_status, wor_createby, wor_createdate, wor_lampiran) " &
-                      "VALUES (@WorNo, @WorSupplier, @WorDamage, @WorMoldTool, @WorMachine, @WorRepairBy, @WorAddNote, @WorStok, @WorTotalOrder, @WorTglProduksi, @WorStatus, @WorCreateBy, @WorCreateDate, @WorLampiran)"
+                Dim query As String = "INSERT INTO db_purchasing.dbo.t_workorder (wor_no, wor_supplier, wor_damage, wor_datashot, wor_mold_tool, wor_machine, wor_repairby, wor_addnote, wor_stok, wor_total_order, wor_tglproduksi, wor_status, wor_createby, wor_createdate, wor_lampiran) " &
+                      "VALUES (@WorNo, @WorSupplier, @WorDamage, @WorDatashot, @WorMoldTool, @WorMachine, @WorRepairBy, @WorAddNote, @WorStok, @WorTotalOrder, @WorTglProduksi, @WorStatus, @WorCreateBy, @WorCreateDate, @WorLampiran)"
 
                 Using cmd As New SqlCommand(query, conn)
                     cmd.Parameters.AddWithValue("@WorNo", worNo)
                     cmd.Parameters.AddWithValue("@WorSupplier", worSupplier)
                     cmd.Parameters.AddWithValue("@WorDamage", worDamage)
+                    cmd.Parameters.AddWithValue("@WorDatashot", worDatashot)
                     cmd.Parameters.AddWithValue("@WorMoldTool", worMoldTool)
                     cmd.Parameters.AddWithValue("@WorMachine", worMachine)
                     cmd.Parameters.AddWithValue("@WorRepairBy", worRepairBy)

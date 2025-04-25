@@ -139,8 +139,10 @@
                                             <asp:ListItem Text="Waiting Approval" Value="1"></asp:ListItem>
                                             <asp:ListItem Text="Need Response" Value="2"></asp:ListItem>
                                             <asp:ListItem Text="On Progress" Value="3"></asp:ListItem>
-                                            <asp:ListItem Text="Waiting Approval by Technical Superior" Value="4"></asp:ListItem>
+                                            <asp:ListItem Text="Waiting Approval by Kasie Technician" Value="4"></asp:ListItem>
                                             <asp:ListItem Text="Done" Value="5"></asp:ListItem>
+                                            <asp:ListItem Text="Rejected by Kasie Req" Value="7"></asp:ListItem>
+                                            <asp:ListItem Text="Rejected by Kasie Technician" Value="6"></asp:ListItem>
                                             <asp:ListItem Text="Canceled" Value="0"></asp:ListItem>
                                         </asp:DropDownList>
                                     </div>

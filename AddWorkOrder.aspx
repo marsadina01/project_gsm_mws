@@ -225,6 +225,14 @@
                         </div>
                     </div>
                     <div class="form-group row">
+                        <label class="col-sm-3 col-form-label">Total Data Shots <span style="color: red">*</span></label>
+                        <div class="col-sm-9">
+                            <asp:TextBox ID="txtDatashot" runat="server" CssClass="form-control" TextMode="Number" placeholder="Total Data Shots"></asp:TextBox>
+                            <asp:CustomValidator ID="cvDatashot" runat="server" ControlToValidate="txtDatashot" ClientValidationFunction="validateDatashot"
+                                ErrorMessage="Total Data Shots harus diisi." Display="Dynamic" ForeColor="Red" />
+                        </div>
+                    </div>
+                    <div class="form-group row">
                         <label class="col-sm-3 col-form-label">Additional Note</label>
                         <div class="col-sm-9">
                             <asp:TextBox ID="txtketerangan" runat="server" class="form-control" placeholder="Keterangan Tambahan"></asp:TextBox>

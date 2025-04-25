@@ -347,6 +347,10 @@
                                     <td><asp:Label ID="lblMoldLabel" runat="server" Text="Mold"></asp:Label></td>
                                     <td><asp:Label ID="lblmold" runat="server"></asp:Label></td>
                                 </tr>
+                                <tr>
+                                    <td><asp:Label ID="lblrestime" runat="server" EnableViewState="false"></asp:Label></td>
+                                    <td><asp:Label ID="lblclosetime" runat="server" EnableViewState="false"></asp:Label></td>
+                                </tr>
                             </table>
                         </div>
                     </div>

@@ -18,12 +18,12 @@ Partial Class ViewWorkOrder
         End If
 
         If Not IsPostBack Then
-            data()
+            data(isFirstLoad:=True)
         End If
     End Sub
 
-    Public Sub data(Optional ByVal isReset As Boolean = False)
-        ' Ambil kontrol filter langsung dari halaman, bukan dari RepeaterItem
+    Public Sub data(Optional ByVal isReset As Boolean = False, Optional ByVal isFirstLoad As Boolean = False)
+        ' Ambil kontrol filter
         Dim ddlBreakdown As DropDownList = TryCast(Master.FindControl("ContentPlaceHolder1").FindControl("ddlBreakdown"), DropDownList)
         Dim txtReqDate As TextBox = TryCast(Master.FindControl("ContentPlaceHolder1").FindControl("txtReqDate"), TextBox)
         Dim ddlStatus As DropDownList = TryCast(Master.FindControl("ContentPlaceHolder1").FindControl("ddlStatus"), DropDownList)
@@ -36,61 +36,79 @@ Partial Class ViewWorkOrder
         Dim conn As New SqlConnection(connStr)
         conn.Open()
 
-        ' Perbaikan sintaks SQL (DESC harus setelah ORDER BY)
         Dim MatSql As String = "SELECT " +
-                                    " w.wor_no," +
-                                    " s.spl_nama As wor_supplier," +
-                                    " w.wor_damage," +
-                                    " m.mold_name As wor_mold_tool," +
-                                    " w.wor_createdate," +
-                                    " w.wor_responsedate," +
-                                    " w.wor_repairby," +
-                                    " w.wor_finisheddate," +
-                                    " w.wor_status  " +
-                                 "From db_purchasing.dbo.t_workorder w " +
-                                    "INNER Join db_purchasing.dbo.tlkp_supplier s ON w.wor_supplier = s.spl_id " +
-                                    "INNER Join db_master_data.dbo.tlkp_mnt m ON w.wor_mold_tool = m.mold_id " +
-                                 "WHERE 1 = 1 "
+                                " w.wor_no," +
+                                " s.spl_nama AS wor_supplier," +
+                                " w.wor_damage," +
+                                " m.mold_name AS wor_mold_tool," +
+                                " w.wor_createdate," +
+                                " w.wor_responsedate," +
+                                " w.wor_repairby," +
+                                " w.wor_finisheddate," +
+                                " w.wor_status " +
+                           " FROM db_purchasing.dbo.t_workorder w " +
+                           " INNER JOIN db_purchasing.dbo.tlkp_supplier s ON w.wor_supplier = s.spl_id " +
+                           " INNER JOIN db_master_data.dbo.tlkp_mnt m ON w.wor_mold_tool = m.mold_id " +
+                           " WHERE 1=1 "
 
-        ' Tambahkan filter berdasarkan Session("namainfor") jika ada
+        ' Filter berdasarkan Session("nameinfor")
         If Session("nameinfor") IsNot Nothing AndAlso Not String.IsNullOrEmpty(Session("nameinfor").ToString()) Then
             MatSql += " AND w.wor_supplier = @NamaInfor"
             MatComm.Parameters.AddWithValue("@NamaInfor", Session("nameinfor").ToString())
         End If
 
-        If Session("role") = "teknisiSup" Then
-            MatSql += " AND w.wor_repairby = 'Supplier' AND w.wor_status <> 1 AND w.wor_status <> 0"
-        ElseIf Session("role") = "teknisiGS" Then
-            MatSql += " AND w.wor_repairby = 'GS' AND w.wor_status <> 1 AND w.wor_status <> 0"
-        ElseIf Session("role") = "atstekSup" Then
-            MatSql += " AND w.wor_repairby = 'Supplier' AND w.wor_status <> 1 AND w.wor_status <> 2 AND w.wor_status <> 3 AND w.wor_status <> 0"
-        ElseIf Session("role") = "atstekGS" Then
-            MatSql += " AND w.wor_repairby = 'GS' AND w.wor_status <> 1 AND w.wor_status <> 2 AND w.wor_status <> 3 AND w.wor_status <> 0"
-        ElseIf Session("role") = "atsreq" Then
-            MatSql += " AND w.wor_status <> 0"
-        End If
+        ' Filter role
+        If isFirstLoad Then
+            ' Pertama kali load, filter berdasarkan kebutuhan action
+            Select Case Session("role")
+                Case "requester"
+                    MatSql += " AND (w.wor_status = 1 OR w.wor_status = 7)"
+                Case "atsreq"
+                    MatSql += " AND w.wor_status = 1"
+                Case "teknisiSup"
+                    MatSql += " AND w.wor_repairby = 'Supplier' AND (w.wor_status = 2 OR w.wor_status = 3 OR w.wor_status = 6)"
+                Case "teknisiGS"
+                    MatSql += " AND w.wor_repairby = 'GS' AND (w.wor_status = 2 OR w.wor_status = 3 OR w.wor_status = 6)"
+                Case "atstekSup"
+                    ' Tampilkan status Waiting Approval by Kasie Tech (misal 5)
+                    MatSql += " AND w.wor_repairby = 'Supplier' AND w.wor_status = 4"
+                Case "atstekGS"
+                    ' Tampilkan status Waiting Approval by Kasie Tech (misal 5)
+                    MatSql += " AND w.wor_repairby = 'GS' AND w.wor_status = 4"
+                Case Else
+                    ' Tidak filter tambahan
+            End Select
+        Else
+            ' Kalau user melakukan filter manual (search), pakai filter biasa
+            If Session("role") = "teknisiSup" Or Session("role") = "atstekSup" Then
+                MatSql += " AND w.wor_repairby = 'Supplier' AND w.wor_status <> 1 AND w.wor_status <> 0"
+            ElseIf Session("role") = "teknisiGS" Or Session("role") = "atstekGS" Then
+                MatSql += " AND w.wor_repairby = 'GS' AND w.wor_status <> 1 AND w.wor_status <> 0"
+            ElseIf Session("role") = "atsreq" Then
+                MatSql += " AND w.wor_status <> 0"
+            End If
 
-        ' Tambahkan parameter jika user melakukan filter
-        If ddlBreakdown IsNot Nothing AndAlso ddlBreakdown.SelectedValue <> "0" Then
-            MatSql += " AND wor_no LIKE @Breakdown"
-            MatComm.Parameters.AddWithValue("@Breakdown", "%" & ddlBreakdown.SelectedValue & "%")
-        End If
+            ' Tambahkan filter dari form input
+            If ddlBreakdown IsNot Nothing AndAlso ddlBreakdown.SelectedValue <> "0" Then
+                MatSql += " AND wor_no LIKE @Breakdown"
+                MatComm.Parameters.AddWithValue("@Breakdown", "%" & ddlBreakdown.SelectedValue & "%")
+            End If
 
-        If ddlStatus IsNot Nothing AndAlso Not String.IsNullOrEmpty(ddlStatus.SelectedValue) Then
-            MatSql += " AND wor_status = @Status"
-            MatComm.Parameters.AddWithValue("@Status", ddlStatus.SelectedValue)
-        End If
+            If ddlStatus IsNot Nothing AndAlso Not String.IsNullOrEmpty(ddlStatus.SelectedValue) Then
+                MatSql += " AND wor_status = @Status"
+                MatComm.Parameters.AddWithValue("@Status", ddlStatus.SelectedValue)
+            End If
 
-        If txtReqDate IsNot Nothing AndAlso Not String.IsNullOrEmpty(txtReqDate.Text) Then
-            Dim requestDate As DateTime
-            If DateTime.TryParse(txtReqDate.Text, requestDate) Then
-                MatSql += " AND CAST(wor_createdate AS DATE) = @ReqDate"
-                MatComm.Parameters.AddWithValue("@ReqDate", requestDate.ToString("yyyy-MM-dd"))
+            If txtReqDate IsNot Nothing AndAlso Not String.IsNullOrEmpty(txtReqDate.Text) Then
+                Dim requestDate As DateTime
+                If DateTime.TryParse(txtReqDate.Text, requestDate) Then
+                    MatSql += " AND CAST(wor_createdate AS DATE) = @ReqDate"
+                    MatComm.Parameters.AddWithValue("@ReqDate", requestDate.ToString("yyyy-MM-dd"))
+                End If
             End If
         End If
 
-        ' ORDER BY harus di akhir, dan DESC setelahnya
-        MatSql += " ORDER BY wor_createdate DESC"
+        MatSql += " ORDER BY w.wor_createdate DESC"
 
         MatComm.Connection = conn
         MatComm.CommandText = MatSql
@@ -122,10 +140,12 @@ Partial Class ViewWorkOrder
             ddlBreakdown.SelectedIndex = 0
             txtReqDate.Text = String.Empty
             ddlStatus.SelectedIndex = 0
+
+            data(isReset, isFirstLoad:=True)
+        Else
+            data(isFirstLoad:=False)
         End If
 
-        ' Panggil fungsi `data`
-        data(isReset)
     End Sub
 
     <WebMethod()>
@@ -261,14 +281,19 @@ Partial Class ViewWorkOrder
 
         ' Pastikan status adalah angka valid
         If Not String.IsNullOrEmpty(status) AndAlso IsNumeric(status) Then
-            If status = "2" AndAlso (role = "teknisiGS" OrElse role = "teknisiSup") Then
-                buttons &= "<button type='button' class='btn btn-danger btn-sm' title='Response' style='margin-right: 5px;' onclick='respondToWorkOrder(""" & workOrderNo & """)'>"
-                buttons &= "<i class='fa fa-deafness'></i></button>"
+            If role = "teknisiGS" OrElse role = "teknisiSup" Then
+                If status = 2 Then
+                    buttons &= "<button type='button' class='btn btn-danger btn-sm' title='Response' style='margin-right: 5px;' onclick='respondToWorkOrder(""" & workOrderNo & """)'>"
+                    buttons &= "<i class='fa fa-deafness'></i></button>"
+                End If
+
             End If
 
-            If status = "1" AndAlso (role = "requester") Then
-                buttons &= "<button type='button' class='btn btn-danger btn-sm' title='Cancel' style='margin-right: 5px;' onclick='cancelWorkOrder(""" & workOrderNo & """)'>"
-                buttons &= "<i class='fa fa-close'></i></button>"
+            If role = "requester" Then
+                If status = 1 Then
+                    buttons &= "<button type='button' class='btn btn-danger btn-sm' title='Cancel' style='margin-right: 5px;' onclick='cancelWorkOrder(""" & workOrderNo & """)'>"
+                    buttons &= "<i class='fa fa-close'></i></button>"
+                End If
             End If
         End If
 
@@ -308,7 +333,6 @@ Partial Class ViewWorkOrder
             Case 6 : Return "background-color:#B0C4DE; color:#000080; font-weight:bold; text-align:center;" ' Biru abu-abu
             Case 7 : Return "background-color:#D3D3D3; color:#000000; font-weight:bold; text-align:center;" ' Abu-abu
             Case 0 : Return "background-color:#D3D3D3; color:#000000; font-weight:bold; text-align:center;" ' Abu-abu
-            Case 6 : Return "background-color:#B0C4DE; color:#000080; font-weight:bold; text-align:center;" ' Biru abu-abu
             Case Else : Return "background-color:#FFFFFF; color:#000000; font-weight:bold; text-align:center;" ' Default (Putih)
         End Select
     End Function
