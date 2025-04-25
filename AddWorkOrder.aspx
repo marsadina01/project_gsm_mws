@@ -225,7 +225,7 @@
                         </div>
                     </div>
                     <div class="form-group row">
-                        <label class="col-sm-3 col-form-label">Total Data Shots <span style="color: red">*</span></label>
+                        <label class="col-sm-3 col-form-label">Data Shots <span style="color: red">*</span></label>
                         <div class="col-sm-9">
                             <asp:TextBox ID="txtDatashot" runat="server" CssClass="form-control" TextMode="Number" placeholder="Total Data Shots"></asp:TextBox>
                             <asp:CustomValidator ID="cvDatashot" runat="server" ControlToValidate="txtDatashot" ClientValidationFunction="validateDatashot"
@@ -278,7 +278,7 @@
                 </div>
             </div>
             <div class="form-group d-flex justify-content-between align-items-center w-100">
-                <a type="button" class="btn btn-danger custom-btn" href="ViewWorkOrder.aspx">Cancel WO</a>
+                <a type="button" class="btn btn-danger custom-btn" href="ViewWorkOrder.aspx">Kembali</a>
                 <asp:Button ID="btnSimpan" runat="server" CssClass="btn btn-primary custom-btn" Text="Simpan" OnClientClick="return validateForm();" OnClick="btnSave_Click" />
 
             </div>

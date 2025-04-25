@@ -15,6 +15,9 @@ Partial Class DetailWorkOrder
             Response.Redirect("default.aspx")
         End If
 
+        ' Inisialisasi default: lampiranwo disembunyikan dulu
+        lampiranwo.Visible = False
+
         If Not IsPostBack Then
 
             Dim worNo As String = Request.QueryString("wor_no")
@@ -71,6 +74,7 @@ Partial Class DetailWorkOrder
                     btnBack.Visible = False
                     btnClose.Visible = False
                     btnUpdate.Visible = False
+                    lampiranwo.Visible = False
                 ElseIf Session("role") = "requester" Then
                     detail1.Visible = True
                     detail2.Visible = False
@@ -80,6 +84,7 @@ Partial Class DetailWorkOrder
                     btnBack.Visible = False
                     btnClose.Visible = False
                     btnUpdate.Visible = True ' requester bisa update/upload
+                    lampiranwo.Visible = False
                 Else
                     detail1.Visible = False
                     detail2.Visible = True
@@ -89,6 +94,7 @@ Partial Class DetailWorkOrder
                     btnBack.Visible = True
                     btnClose.Visible = False
                     btnUpdate.Visible = False
+                    lampiranwo.Visible = False
                 End If
 
             ElseIf worStatus = 3 Then
@@ -101,7 +107,7 @@ Partial Class DetailWorkOrder
                     btnBack.Visible = True
                     btnClose.Visible = True
                     btnUpdate.Visible = False
-                    btnLampiran.Visible = True
+                    lampiranwo.Visible = True
                 Else
                     detail1.Visible = False
                     detail2.Visible = True
@@ -111,7 +117,7 @@ Partial Class DetailWorkOrder
                     btnBack.Visible = True
                     btnClose.Visible = False
                     btnUpdate.Visible = False
-                    btnLampiran.Visible = False
+                    lampiranwo.Visible = False
                 End If
 
             ElseIf worStatus = 4 Then
@@ -124,6 +130,7 @@ Partial Class DetailWorkOrder
                     btnBack.Visible = False
                     btnClose.Visible = False
                     btnUpdate.Visible = False
+                    lampiranwo.Visible = False
                 Else
                     detail1.Visible = False
                     detail2.Visible = True
@@ -133,6 +140,7 @@ Partial Class DetailWorkOrder
                     btnBack.Visible = True
                     btnClose.Visible = False
                     btnUpdate.Visible = False
+                    lampiranwo.Visible = False
                 End If
 
             Else
@@ -399,19 +407,26 @@ Partial Class DetailWorkOrder
     Private Sub LoadUploadedFiles()
         Dim filePath As String = "~/Uploads/"
         Dim fileName As String = ""
+        Dim fileNameWO As String = ""
         Dim worNo As String = Request.QueryString("wor_no")
 
-        Dim queryFile As String = "SELECT wor_lampiran FROM t_workorder WHERE wor_no = @wor_no"
+        Dim queryFile As String = "SELECT wor_lampiran, wor_lampiranwo FROM t_workorder WHERE wor_no = @wor_no"
 
         Using conn As New SqlConnection(connStr)
             Using cmd As New SqlCommand(queryFile, conn)
                 cmd.Parameters.AddWithValue("@wor_no", worNo)
                 Try
                     conn.Open()
-                    Dim result As Object = cmd.ExecuteScalar()
-                    If result IsNot DBNull.Value AndAlso result IsNot Nothing Then
-                        fileName = result.ToString()
-                    End If
+                    Using reader As SqlDataReader = cmd.ExecuteReader()
+                        If reader.Read() Then
+                            If reader("wor_lampiran") IsNot DBNull.Value Then
+                                fileName = reader("wor_lampiran").ToString()
+                            End If
+                            If reader("wor_lampiranwo") IsNot DBNull.Value Then
+                                fileNameWO = reader("wor_lampiranwo").ToString()
+                            End If
+                        End If
+                    End Using
                 Catch ex As Exception
                     Response.Write("<script>alert('Error: " & ex.Message & "');</script>")
                 Finally
@@ -420,14 +435,26 @@ Partial Class DetailWorkOrder
             End Using
         End Using
 
+        ' === Lampiran 1 ===
         If Not String.IsNullOrEmpty(fileName) Then
             Dim fileUrl As String = ResolveUrl(filePath & fileName)
             lnkLampiran.Visible = True
-            lnkLampiran.NavigateUrl = "#" ' Prevent default link behavior
+            lnkLampiran.NavigateUrl = "#"
             lnkLampiran.Attributes.Add("onclick", "showLampiranModal('" & fileUrl & "'); return false;")
             lnkLampiran.Text = "📄 Lihat Lampiran"
         Else
             lnkLampiran.Visible = False
+        End If
+
+        ' === Lampiran WO ===
+        If Not String.IsNullOrEmpty(fileNameWO) Then
+            Dim fileUrlWO As String = ResolveUrl(filePath & fileNameWO)
+            lnkLampiran2.Visible = True
+            lnkLampiran2.NavigateUrl = "#"
+            lnkLampiran2.Attributes.Add("onclick", "showLampiranModal('" & fileUrlWO & "'); return false;")
+            lnkLampiran2.Text = "📄 Lihat Lampiran WO"
+        Else
+            lnkLampiran2.Visible = False
         End If
     End Sub
 

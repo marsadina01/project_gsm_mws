@@ -503,22 +503,63 @@
                 </div>
             </div>
 
-            <div class="box">
-                <div class="box-header">
-                    <div class="form-group">
-                        <asp:Button ID="btnLampiran" runat="server" class="btn btn-secondary" Text="Lampiran WO" OnClientClick="toggleUploadBox(); return false;" />
+          <div id="lampiranwo" runat="server">
+                <div class="box">
+                    <div class="box-header">
+                        <div class="form-group">
+                            <asp:Button ID="btnLampiran" runat="server" class="btn btn-secondary" Text="Lampiran WO" OnClientClick="toggleUploadBox(); return false;" />
+                        </div>
+                    </div>
+             
+
+                    <!-- Box Body (Awalnya Tersembunyi) -->
+                    <div class="box-body" id="uploadBox" style="display: none;">
+                        <div class="upload-area" id="uploadArea">
+                            <label for="fileInput" class="upload-icon">
+                            </label>
+                            <input type="file" id="fileInput" style="display: none;" />
+                            <asp:FileUpload ID="fuLampiran" runat="server" />
+    <%--                        <asp:Button ID="btnUpload" runat="server" Text="Upload File" OnClick="btnUpload_Click" CssClass="btn btn-primary" />--%>
+                            <asp:Label ID="lblMessage" runat="server" ForeColor="Red"></asp:Label>
+                        </div>
                     </div>
                 </div>
+             </div>
 
-                <!-- Box Body (Awalnya Tersembunyi) -->
-                <div class="box-body" id="uploadBox" style="display: none;">
-                    <div class="upload-area" id="uploadArea">
-                        <label for="fileInput" class="upload-icon">
-                        </label>
-                        <input type="file" id="fileInput" style="display: none;" />
-                        <asp:FileUpload ID="fuLampiran" runat="server" />
-<%--                        <asp:Button ID="btnUpload" runat="server" Text="Upload File" OnClick="btnUpload_Click" CssClass="btn btn-primary" />--%>
-                        <asp:Label ID="lblMessage" runat="server" ForeColor="Red"></asp:Label>
+            <div class="box">
+                <div class="box-body text-left">
+                    <asp:HyperLink ID="lnkLampiran2" runat="server" onClick="showLampiranModal" CssClass="btn lampiran-btn" Visible="false">
+                        Lihat Lampiran WO
+                    </asp:HyperLink>
+                </div>
+            </div>
+
+            <!-- Modal untuk menampilkan file -->
+            <div id="lampiranModal" class="modal fade" tabindex="-1" role="dialog">
+                <div class="modal-dialog modal-lg" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Lampiran WO</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+            
+                        <div class="modal-body text-center">
+                            <!-- Preview Lampiran -->
+                            <iframe id="iframeLampiran" style="width:100%; height:500px; border:none;"></iframe>
+
+                            <!-- Tombol edit -->
+                            <asp:Button ID="Button1" runat="server" Text="Edit Lampiran" CssClass="btn btn-warning mt-3" OnClientClick="showUploadForm(); return false;" />
+
+                            <!-- Upload ulang file -->
+                            <div id="uploadForm" style="display:none;" class="mt-3">
+                                <asp:FileUpload ID="FileUpload1" runat="server" />
+                                <asp:Button ID="Button2" runat="server" Text="Upload Ulang" CssClass="btn btn-success" OnClick="btnUploadLampiranBaru_Click" />
+                                <br />
+                                <asp:Label ID="Label1" runat="server" CssClass="d-block mt-2 text-danger" />
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -531,7 +572,7 @@
                     OnClientClick="return showRejectReason();"
                     OnClick="btnReject_Click" />
                 <asp:Button ID="btnApprove" runat="server" class="btn btn-success" Text="Approve" OnClick="btnApprove_Click" />
-                <asp:Button ID="btnBack" runat="server" class="btn btn-secondary-outline" Text="Back" OnClick="btnBack_Click" />
+                <asp:Button ID="btnBack" runat="server" class="btn btn-danger custom-btn" Text="Back" OnClick="btnBack_Click" />
                 <asp:Button ID="btnClose" runat="server" CssClass="btn btn-primary" Text="Close WO" OnClick="btnClose_Click" />
                 <asp:Button ID="btnUpdate" runat="server" CssClass="btn btn-success" Text="Update" Onclick="btnUpdate_Click" />
 <%--                <asp:Label ID="lblDebug" runat="server" ForeColor="Red" />--%>
