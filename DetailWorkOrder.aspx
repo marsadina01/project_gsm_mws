@@ -1,4 +1,4 @@
-﻿<%@ Page Language="VB" MasterPageFile="~/MasterPageNew.master" AutoEventWireup="false" CodeFile="DetailWorkOrder.aspx.vb" Inherits="DetailWorkOrder" %>
+﻿ <%@ Page Language="VB" MasterPageFile="~/MasterPageNew.master" AutoEventWireup="false" CodeFile="DetailWorkOrder.aspx.vb" Inherits="DetailWorkOrder" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="head" runat="Server">
     <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.min.css" />
