@@ -102,6 +102,7 @@
                                 <li><a href="MasterMold.aspx"><i class="fa fa-cube"></i> Master Mold</a></li>
                             </ul>
                         </li>
+                        <li id="li_workorder" runat="server"><a href="ViewWorkOrder.aspx" title="Work Order"><i class="fa fa-file"></i><span> Work Order</span></a></li>
                         <li><a id="A3" href="#" runat="server" onserverclick="logout_click" title="Keluar"><i class="fa fa-power-off"></i><span> Keluar</span></a></li>
                     </ul>
                 </section>
