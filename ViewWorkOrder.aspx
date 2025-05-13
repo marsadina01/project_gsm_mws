@@ -14,6 +14,9 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+    
     <!-- SweetAlert -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
@@ -38,6 +41,12 @@
     </script>
 
     <style>
+
+        .select2-container .select2-selection--single {
+            height: 33px !important;
+            padding: 5px;
+            border-radius: 4px;
+        }
 
         .table-responsive {
             overflow-x: auto;
@@ -116,7 +125,7 @@
                                 <!-- Pilih Tipe Breakdown -->
                                 <div class="col-md-3">
                                     <div class="form-group">
-                                        <asp:DropDownList ID="ddlBreakdown" runat="server" class="form-control">
+                                        <asp:DropDownList ID="ddlBreakdown" runat="server" class="form-control select2">
                                             <asp:ListItem Text="-- Pilih Tipe Breakdown --" Value="0" Selected="True" Disabled="True"></asp:ListItem>
                                             <asp:ListItem Text="Mold" Value="BM"></asp:ListItem>
                                             <asp:ListItem Text="Tool" Value="BT"></asp:ListItem>
@@ -134,7 +143,7 @@
                                 <!-- Dropdown Status -->
                                 <div class="col-md-3">
                                     <div class="form-group">
-                                        <asp:DropDownList ID="ddlStatus" runat="server" class="form-control">
+                                        <asp:DropDownList ID="ddlStatus" runat="server" class="form-control select2">
                                             <asp:ListItem Text="-- Pilih Status --" Value="" Selected="True" Disabled="True"></asp:ListItem>
                                             <asp:ListItem Text="Waiting Approval" Value="1"></asp:ListItem>
                                             <asp:ListItem Text="Need Response" Value="2"></asp:ListItem>
