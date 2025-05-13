@@ -36,11 +36,12 @@ Partial Class _Default
         Dim lblMs As String
         Dim admin As String
         Dim seksi As String
+        Dim hashedinput As String = EncryptString(Trim(Me.DecryptStringPass(txtpcript.Text)))
 
         Dim connFam As New SqlConnection(strConnString)
-        SQLF = "SELECT md.*, us.user_nama FROM db_master_data.dbo.VIEW_DATAAUTH md join db_purchasing.dbo.tlkp_user us on md.emp_no=us.user_npk WHERE emp_no = " & txtucript.Text & ""
+        SQLF = "SELECT md.*, us.user_nama FROM db_master_data.dbo.VIEW_DATAAUTH md join db_purchasing.dbo.tlkp_user us on md.emp_no=us.user_npk WHERE emp_no = '" & txtucript.Text & "' AND user_pass = '" & hashedinput & "'"
 
-        Response.Write("1 SELECT md.*, us.user_nama FROM db_master_data.dbo.VIEW_DATAAUTH md join db_purchasing.dbo.tlkp_user us on md.emp_no=us.user_npk WHERE emp_no = '" & txtucript.Text & "'  ")
+        'Response.Write("1 SELECT md.*, us.user_nama FROM db_master_data.dbo.VIEW_DATAAUTH md join db_purchasing.dbo.tlkp_user us on md.emp_no=us.user_npk WHERE emp_no = '" & txtucript.Text & "'")
 
         commlogin.Connection = connFam
         commlogin.CommandText = SQLF
@@ -83,7 +84,7 @@ Partial Class _Default
                     '    flgLogin = False
                     'End Try
                     If flgLogin = True Then
-                        Dim dv As DataTable = get_data_pch("SELECT * FROM tlkp_user WHERE user_npk = '" & txtucript.Text & "'")
+                        Dim dv As DataTable = get_data_pch("SELECT * FROM tlkp_user WHERE user_npk = '" & txtucript.Text & "' AND user_pass = '" & hashedinput & "'")
 
                         If dv.Rows.Count > 0 Then
                             Dim userRow As DataRow = dv.Rows(0)
@@ -273,8 +274,9 @@ Partial Class _Default
 
                 End If
             Else
-                lblMsg = "Username not found."
-                Response.Write("<script>alert('" + lblMsg + "');window.location='Default.aspx';window.open='Default.aspx'</script>")
+                InvalidCredentialsMessage.Visible = True
+                'lblMsg = "Username not found. "
+                'Response.Write("<script>alert('" + lblMsg + "');window.location='Default.aspx';window.open='Default.aspx'</script>")
             End If
         End If
     End Sub
