@@ -22,183 +22,200 @@
         </section>
         
         <section class="content">
-            <div class="row">                
-       <%--          <div class="col-lg-3 col-xs-6"  id="div1" runat="server">
-                    <!-- small box -->
-                    <a href="Default.aspx" style="color:White">
-                    <div class="small-box bg-primary">
-                    <div class="inner">
-                        <h3 style="color:white;font-family:Rubik-Light;"><asp:Label ID="setting" runat="Server" Text="Component"/></h3>
+          <div class="container-fluid">
+            <!-- Tabs -->
+            <ul class="nav nav-tabs" id="dashboardTab" role="tablist">
+              <li class="nav-item">
+                <a class="nav-link active" id="tabMenu-tab" data-toggle="tab" href="#tabMenu" role="tab" aria-controls="tabMenu" aria-selected="true">Menu</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" id="tabGrafik-tab" data-toggle="tab" href="#tabGrafik" role="tab" aria-controls="tabGrafik" aria-selected="false">Grafik Request</a>
+              </li>
+            </ul>
 
-                        <p style="color:white; font-size:smaller";>WHS Component</p>
-                           <div class="icon" style="padding-top:15px;">
-                                <i class="glyphicon glyphicon-search" style="color:white"></i>
+            <!-- Tab Contents -->
+            <div class="tab-content mt-3" id="dashboardTabContent">
+              <!-- Menu Tab -->
+              <div class="tab-pane fade show active" id="tabMenu" role="tabpanel" aria-labelledby="tabMenu-tab">
+                <div class="row" id="menuButtonsContainer">
+                  <div class="col-lg-3 col-xs-12" id="divsetting" runat="server" >
+                     <a href="Master_UserP.aspx">
+                         <div class="small-box" style="background-color:#656565;">
+                             <div class="inner">
+                                 <h3 style="color:white;font-family:Rubik-Regular;">Setting</h3>
+                                 <p style="color:white;">Setting Data</p>
+                             </div>
+                 
+                             <div class="icon" style="padding-top:15px;">
+                                 <i class="ion ion-android-settings"></i>
+                             </div>
                          </div>
-                           <a href="Default.aspx" class="small-box-footer"></a>
-                    </div> 
+                     </a>
+                 </div>
+
+                 <div class="col-lg-3 col-xs-12" id="divvendor" runat="server" >
+                     <a href="Master_UseV.aspx">
+                         <div class="small-box bg-red">
+                             <div class="inner">
+                                 <h3 style="color:white;font-family:Rubik-Regular;">Vendor</h3>
+                                 <p style="color:white;">Vendor</p>
+                             </div>
+                 
+                             <div class="icon" style="padding-top:15px;">
+                                 <i class="ion ion-briefcase"></i>
+                             </div>
+                         </div>
+                     </a>
+                 </div>
+
+                 <div class="col-lg-3 col-xs-12" id="divprofile" runat="server" >
+                     <a href="Profile.aspx">
+                         <div class="small-box bg-primary">
+                             <div class="inner">
+                                 <h3 style="color:white;font-family:Rubik-Regular;">Profile</h3>
+                                 <p style="color:white;">Profile</p>
+                             </div>
+                 
+                             <div class="icon" style="padding-top:15px;">
+                                 <i class="ion ion-android-people"></i>
+                             </div>
+                         </div>
+                     </a>
+                 </div>
+
+                 <div class="col-lg-3 col-xs-12" id="divasset" runat="server">
+                     <asp:HyperLink ID="amonitoring" runat="server">
+                         <div class="small-box bg-aqua">
+                             <div class="inner">
+                                 <h3 style="color:white;font-family:Rubik-Regular;font-weight:bold;">Monitoring</h3>
+                                 <p style="color:white;">Daily Delivery Monitoring</p>
+
+                                 <asp:HyperLink class="small-box-footer" ID="asmonitoring" runat="server"></asp:HyperLink>
+                             </div>
+
+                             <div class="icon" style="padding-top:15px;">
+                                 <i class="ion ion-monitor"></i>
+                             </div>
+                       </div>
+                     </asp:HyperLink>
+                 </div>
+
+                 <div class="col-lg-3 col-xs-12" id="divpm" runat="server" >
+                     <a href="VQM.aspx">
+                         <div class="small-box bg-purple">
+                             <div class="inner">
+                                 <h3 style="color:white;font-family:Rubik-Regular;">MVP</h3>
+                                 <p style="color:white;">Monthly Vendor Performance</p>
+                             </div>
+                 
+                             <div class="icon" style="padding-top:15px;">
+                                 <i class="fa fa-line-chart"></i>
+                             </div>
+                         </div>
+                     </a>
+                 </div>
+
+                 <div class="col-lg-3 col-xs-12" id="divmvp_quality" runat="server" visible="false">
+                     <a href="VQM_Quality.aspx">
+                         <div class="small-box bg-purple-active">
+                             <div class="inner">
+                                 <h3 style="color:white;font-family:Rubik-Regular;">MVP</h3>
+                                 <p style="color:white;">Resume MVP Quality</p>
+                             </div>
+                 
+                             <div class="icon" style="padding-top:15px;">
+                                 <i class="ion ion-android-star"></i>
+                             </div>
+                         </div>
+                     </a>
+                 </div>
+
+                 <div class="col-lg-3 col-xs-12" id="divpm1" runat="server">
+                     <asp:HyperLink ID="linkdok2" runat="server">
+                         <div class="small-box bg-maroon">
+                             <div class="inner">
+                                 <h3 style="color:white;font-family:Rubik-Regular;font-weight:bold;">Document</h3>
+                                 <p style="color:white;">Procedure, SE, SM, PPAP, etc.</p>
+
+                                 <asp:HyperLink class="small-box-footer" ID="linkdok" runat="server"></asp:HyperLink>
+                             </div>
+
+                             <div class="icon" style="padding-top:15px;">
+                                 <i class="ion ion-android-document"></i>
+                             </div>
+                       </div>
+                     </asp:HyperLink>
+                 </div>
+
+                 <div class="col-lg-3 col-xs-12" id="dvgps" runat="server">
+                     <asp:HyperLink ID="adoc1" runat="server">
+                         <div class="small-box bg-yellow">
+                             <div class="inner">
+                                 <h3 style="color:white;font-family:Rubik-Regular;font-weight:bold;">Invoices</h3>
+                                 <p style="color:white;">Document</p>
+
+                                 <asp:HyperLink class="small-box-footer" ID="adoc" runat="server"></asp:HyperLink>
+                             </div>
+
+                             <div class="icon" style="padding-top:15px;">
+                                 <i class="ion ion-android-list"></i>
+                             </div>
+                       </div>
+                     </asp:HyperLink>
+                 </div>
+
+                 <div class="col-lg-3 col-xs-12" id="divapp" runat="server" >
+                     <a href="App_Doc.aspx">
+                         <div class="small-box bg-green">
+                             <div class="inner">
+                                 <h3 style="color:white;font-family:Rubik-Regular;">Approval</h3>
+                                 <p style="color:white;">Approval Document</p>
+                             </div>
+                 
+                             <div class="icon" style="padding-top:15px;">
+                                 <i class="ion ion-checkmark"></i>
+                             </div>
+                         </div>
+                     </a>
+                 </div>
+
+                 <div class="col-lg-3 col-xs-12" id="div1" runat="server" >
+                     <a href="ViewWorkOrder.aspx">
+                         <div class="small-box bg-red">
+                             <div class="inner">
+                                 <h3 style="color:white;font-family:Rubik-Regular;">MWS</h3>
+                                 <p style="color:white;">Mold an Tool</p>
+                             </div>
+                 
+                             <div class="icon" style="padding-top:15px;">
+                                 <i class="ion ion-checkmark"></i>
+                             </div>
+                         </div>
+                     </a>
+                 </div>
+
+              </div>
+
+              <!-- Grafik Request Tab -->
+              <div class="tab-pane fade" id="tabGrafik" role="tabpanel" aria-labelledby="tabGrafik-tab">
+                <div class="row" id="grafikContainer">
+                  <div class="col-xs-12">
+                    <h4>Grafik Dashboard Request</h4>
+                    <div id="grafikContainer1">
+                      <!-- Tidak ada data, maka hanya header ini yang muncul -->
                     </div>
-                    </a>
-                </div>--%>
-
-                <div class="col-lg-3 col-xs-12" id="divsetting" runat="server" >
-                    <a href="Master_UserP.aspx">
-                        <div class="small-box" style="background-color:#656565;">
-                            <div class="inner">
-                                <h3 style="color:white;font-family:Rubik-Regular;">Setting</h3>
-                                <p style="color:white;">Setting Data</p>
-                            </div>
-                        
-                            <div class="icon" style="padding-top:15px;">
-                                <i class="ion ion-android-settings"></i>
-                            </div>
-                        </div>
-                    </a>
+                  </div>
                 </div>
-
-                <div class="col-lg-3 col-xs-12" id="divvendor" runat="server" >
-                    <a href="Master_UseV.aspx">
-                        <div class="small-box bg-red">
-                            <div class="inner">
-                                <h3 style="color:white;font-family:Rubik-Regular;">Vendor</h3>
-                                <p style="color:white;">Vendor</p>
-                            </div>
-                        
-                            <div class="icon" style="padding-top:15px;">
-                                <i class="ion ion-briefcase"></i>
-                            </div>
-                        </div>
-                    </a>
-                </div>
-
-                <div class="col-lg-3 col-xs-12" id="divprofile" runat="server" >
-                    <a href="Profile.aspx">
-                        <div class="small-box bg-primary">
-                            <div class="inner">
-                                <h3 style="color:white;font-family:Rubik-Regular;">Profile</h3>
-                                <p style="color:white;">Profile</p>
-                            </div>
-                        
-                            <div class="icon" style="padding-top:15px;">
-                                <i class="ion ion-android-people"></i>
-                            </div>
-                        </div>
-                    </a>
-                </div>
-
-                <div class="col-lg-3 col-xs-12" id="divasset" runat="server">
-                    <asp:HyperLink ID="amonitoring" runat="server">
-                        <div class="small-box bg-aqua">
-                            <div class="inner">
-                                <h3 style="color:white;font-family:Rubik-Regular;font-weight:bold;">Monitoring</h3>
-                                <p style="color:white;">Daily Delivery Monitoring</p>
-
-                                <asp:HyperLink class="small-box-footer" ID="asmonitoring" runat="server"></asp:HyperLink>
-                            </div>
-
-                            <div class="icon" style="padding-top:15px;">
-                                <i class="ion ion-monitor"></i>
-                            </div>
-                      </div>
-                    </asp:HyperLink>
-                </div>
-
-                <div class="col-lg-3 col-xs-12" id="divpm" runat="server" >
-                    <a href="VQM.aspx">
-                        <div class="small-box bg-purple">
-                            <div class="inner">
-                                <h3 style="color:white;font-family:Rubik-Regular;">MVP</h3>
-                                <p style="color:white;">Monthly Vendor Performance</p>
-                            </div>
-                        
-                            <div class="icon" style="padding-top:15px;">
-                                <i class="fa fa-line-chart"></i>
-                            </div>
-                        </div>
-                    </a>
-                </div>
-
-                <div class="col-lg-3 col-xs-12" id="divmvp_quality" runat="server" visible="false">
-                    <a href="VQM_Quality.aspx">
-                        <div class="small-box bg-purple-active">
-                            <div class="inner">
-                                <h3 style="color:white;font-family:Rubik-Regular;">MVP</h3>
-                                <p style="color:white;">Resume MVP Quality</p>
-                            </div>
-                        
-                            <div class="icon" style="padding-top:15px;">
-                                <i class="ion ion-android-star"></i>
-                            </div>
-                        </div>
-                    </a>
-                </div>
-
-                <div class="col-lg-3 col-xs-12" id="divpm1" runat="server">
-                    <asp:HyperLink ID="linkdok2" runat="server">
-                        <div class="small-box bg-maroon">
-                            <div class="inner">
-                                <h3 style="color:white;font-family:Rubik-Regular;font-weight:bold;">Document</h3>
-                                <p style="color:white;">Procedure, SE, SM, PPAP, etc.</p>
-
-                                <asp:HyperLink class="small-box-footer" ID="linkdok" runat="server"></asp:HyperLink>
-                            </div>
-
-                            <div class="icon" style="padding-top:15px;">
-                                <i class="ion ion-android-document"></i>
-                            </div>
-                      </div>
-                    </asp:HyperLink>
-                </div>
-
-                <div class="col-lg-3 col-xs-12" id="dvgps" runat="server">
-                    <asp:HyperLink ID="adoc1" runat="server">
-                        <div class="small-box bg-yellow">
-                            <div class="inner">
-                                <h3 style="color:white;font-family:Rubik-Regular;font-weight:bold;">Invoices</h3>
-                                <p style="color:white;">Document</p>
-
-                                <asp:HyperLink class="small-box-footer" ID="adoc" runat="server"></asp:HyperLink>
-                            </div>
-
-                            <div class="icon" style="padding-top:15px;">
-                                <i class="ion ion-android-list"></i>
-                            </div>
-                      </div>
-                    </asp:HyperLink>
-                </div>
-
-                <div class="col-lg-3 col-xs-12" id="divapp" runat="server" >
-                    <a href="App_Doc.aspx">
-                        <div class="small-box bg-green">
-                            <div class="inner">
-                                <h3 style="color:white;font-family:Rubik-Regular;">Approval</h3>
-                                <p style="color:white;">Approval Document</p>
-                            </div>
-                        
-                            <div class="icon" style="padding-top:15px;">
-                                <i class="ion ion-checkmark"></i>
-                            </div>
-                        </div>
-                    </a>
-                </div>
-
-                <div class="col-lg-3 col-xs-12" id="div1" runat="server" >
-                    <a href="ViewWorkOrder.aspx">
-                        <div class="small-box bg-red">
-                            <div class="inner">
-                                <h3 style="color:white;font-family:Rubik-Regular;">MWS</h3>
-                                <p style="color:white;">Mold an Tool</p>
-                            </div>
-                        
-                            <div class="icon" style="padding-top:15px;">
-                                <i class="ion ion-checkmark"></i>
-                            </div>
-                        </div>
-                    </a>
-                </div>
-
+              </div>
             </div>
+          </div>
         </section>
+
     </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+
     <script src="bower_components/jquery/dist/jquery.min.js"></script>
     <!-- Bootstrap 3.3.7 -->
     <script src="bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
@@ -209,20 +226,39 @@
     <!-- AdminLTE for demo purposes -->
     <script src="dist/js/demo.js"></script>
     <script type="text/javascript" src="bower_components/select2/dist/js/select2.full.min.js"></script>
-        <script type="text/javascript">
+    <script type="text/javascript">
         $(function () {
-        $('.select2').select2()
+            $('.select2').select2()
 
-        $('#site').DataTable()
-        $('#template').DataTable({
-          'paging'      : true,
-          'lengthChange': false,
-          'searching'   : false,
-          'ordering'    : true,
-          'info'        : true,
-          'autoWidth'   : false
+            $('#site').DataTable()
+            $('#template').DataTable({
+              'paging'      : true,
+              'lengthChange': false,
+              'searching'   : false,
+              'ordering'    : true,
+              'info'        : true,
+              'autoWidth'   : false
+            })
         })
-      })
+
+        $(document).ready(function () {
+            $('#dashboardTab a[href="#tabMenu"]').tab('show');
+
+            $('#dashboardTab a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+                var target = $(e.target).attr("href");
+
+                if (target === '#tabGrafik') {
+                    $('#menuButtonsContainer').hide();       
+                    $('#grafikContainer').show();            
+                } else if (target === '#tabMenu') {
+                    $('#menuButtonsContainer').show();       
+                    $('#grafikContainer').hide();            
+                }
+            });
+
+            // Inisialisasi: sembunyikan grafik saat pertama kali halaman dibuka
+            $('#grafikContainer').hide();
+        });
     </script>
     <!--script type="text/javascript">
     var url = window.location;
