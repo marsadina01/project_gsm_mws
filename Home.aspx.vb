@@ -16,10 +16,10 @@ Partial Class Home
             End If
         End If
 
-        'If Not IsPostBack Then
-        '    Dim jsonData As String = "[{""label"": ""01 Jan"", ""value"": 5}, {""label"": ""02 Jan"", ""value"": 3}]"
-        '    grafikDataJSON.Text = jsonData
-        'End If
+        If Not IsPostBack Then
+            Dim jsonData As String = "[{""label"": ""01 Jan"", ""value"": 5}, {""label"": ""02 Jan"", ""value"": 3}]"
+            grafikDataJSON.Text = jsonData
+        End If
         ClientScript.RegisterStartupScript(Me.GetType, "ModalScript", "$(function(){$('#modal-faktur').modal('show'); });", True)
 
         Select Case Session("role")
