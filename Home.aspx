@@ -197,21 +197,112 @@
               </div>
 
               <!-- Grafik Request Tab -->
-              <div class="tab-pane fade" id="tabGrafik" role="tabpanel" aria-labelledby="tabGrafik-tab">
-                <div class="row" id="grafikContainer">
-                  <div class="col-xs-12">
-                    <h4>Grafik Dashboard Request</h4>
-                    <div id="grafikContainer1">
-                      <!-- Tidak ada data, maka hanya header ini yang muncul -->
-                    </div>
-                  </div>
+                    <div class="tab-pane fade" id="tabGrafik" role="tabpanel" aria-labelledby="tabGrafik-tab">
+                      <div style="padding: 20px; max-width: 100vw; margin: 0 auto; background: #f8f9fa;">
+                        <h4 class="text-center mb-4" style="font-weight: 600;">Grafik Dashboard Request</h4>                          
+                        <!-- Wrapper kedua chart -->
+                        <div style="display: flex; flex-direction: column; align-items: center; gap: 60px; padding: 20px;">
+
+                          <!-- Chart 1 -->
+                          <div class="card" style="background-color: white; box-shadow: 0 3px 10px rgba(0,0,0,0.15); border-radius: 12px; width: 100%; max-width: 1200px;">
+                            <div class="card-body p-4">
+                              <canvas id="grafikChart1" style="width: 100%; height: 500px;"></canvas>
+                              <asp:Literal ID="grafikDataJSON" runat="server" Visible="false" />
+                            </div>
+                          </div>
+
+                          <!-- Chart 2 -->
+                          <div class="card" style="background-color: white; box-shadow: 0 3px 10px rgba(0,0,0,0.15); border-radius: 12px; width: 100%; max-width: 1200px;">
+                            <div class="card-body p-4">
+                              <canvas id="grafikChart2" style="width: 100%; height: 500px;"></canvas>
+                              <asp:Literal ID="Literal1" runat="server" Visible="false" />
+                            </div>
+                          </div>
+
+                        </div>
+                      </div>
+                      </div>
+
                 </div>
-              </div>
             </div>
           </div>
         </section>
 
     </div>
+
+    <!-- Script Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Script untuk inisialisasi grafik -->
+        <script>
+            // Contoh data dummy, biasanya dari server (ASP.NET binding)
+            var data = {
+                labels: ['01 Jan', '02 Jan', '03 Jan'],
+                values: [5, 10, 7]
+            };
+
+            var ctx1 = document.getElementById('grafikChart1').getContext('2d');
+            var chart1 = new Chart(ctx1, {
+                type: 'bar',
+                data: {
+                    labels: data.labels,
+                    datasets: [{
+                        label: 'Work Order',
+                        data: data.values,
+                        backgroundColor: 'rgba(54, 162, 235, 0.6)'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: { beginAtZero: true, ticks: { stepSize: 1 } }
+                    }
+                }
+            });
+
+            var ctx2 = document.getElementById('grafikChart2').getContext('2d');
+            var chart2 = new Chart(ctx2, {
+                type: 'bar',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May'],
+                    datasets: [
+                        {
+                            label: 'Departemen A',
+                            data: [10, 15, 9, 12, 14],
+                            backgroundColor: 'rgba(255, 99, 132, 0.6)'
+                        },
+                        {
+                            label: 'Departemen B',
+                            data: [8, 13, 11, 9, 10],
+                            backgroundColor: 'rgba(54, 162, 235, 0.6)'
+                        },
+                        {
+                            label: 'Departemen C',
+                            data: [5, 7, 8, 6, 7],
+                            backgroundColor: 'rgba(75, 192, 192, 0.6)'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                stepSize: 1
+                            }
+                        }
+                    }
+                }
+            });
+        </script>
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
