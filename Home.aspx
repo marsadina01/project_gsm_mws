@@ -19,7 +19,49 @@
                 box-sizing: border-box;
             }
         }
+
+        .chart-section {
+          margin: 0 auto 60px auto;
+        }
+
+        .chart-section h4 {
+          text-align: center;
+          font-weight: 600;
+          margin-bottom: 10px;
+        }
+
+        .chart-dropdown-wrapper {
+          display: flex;
+          justify-content: flex-end;
+          margin-bottom: 15px;
+        }
+
+        .chart-dropdown-wrapper label {
+          margin-right: 8px;
+          font-weight: 500;
+          align-self: center;
+        }
+
+        .chart-dropdown-wrapper select,
+        .chart-dropdown-wrapper .form-control {
+          width: 120px;
+        }
+
+        .card {
+            background-color: #ffffff;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            width: 100%;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .card-body {
+            padding: 20px;
+        }
+
+
     </style>
+
 </asp:Content>
 
 <asp:Content ID="Content2" ContentPlaceHolderID="ContentPlaceHolder1" Runat="Server">
@@ -210,14 +252,14 @@
               </div>
 
               <!-- Grafik Request Tab -->
-                    <div class="tab-pane fade" id="tabGrafik" role="tabpanel" aria-labelledby="tabGrafik-tab">
-                                        <div class="row" id="grafikContainer">
+              <div class="tab-pane fade" id="tabGrafik" role="tabpanel" aria-labelledby="tabGrafik-tab">
+                <div class="row" id="grafikContainer">
                   <div class="col-xs-12">
                     <div class="row">
                         <div class="col-lg-2-4 col-xs-12" id="div2" runat="server">
                             <div class="small-box bg-red">
                                 <div class="inner">
-                                    <h3 style="color:white;font-family:Rubik-Regular;">100</h3>
+                                    <h3 style="color:white;font-family:Rubik-Regular;"><asp:Label ID="lblNeedResponse" runat="server" Text="0" /></h3>
                                     <p style="color:white;">Need Response</p>
 
                                     <div class="icon" style="padding-top:15px;">
@@ -229,7 +271,7 @@
                         <div class="col-lg-2-4 col-xs-12" id="div3" runat="server">
                             <div class="small-box bg-yellow">
                                 <div class="inner">
-                                    <h3 style="color:white;font-family:Rubik-Regular;">50</h3>
+                                    <h3 style="color:white;font-family:Rubik-Regular;"><asp:Label ID="lblOnProgress" runat="server" Text="0" /></h3>
                                     <p style="color:white;">On Progress</p>
 
                                     <div class="icon" style="padding-top:15px;">
@@ -241,7 +283,7 @@
                         <div class="col-lg-2-4 col-xs-12" id="div4" runat="server">
                             <div class="small-box bg-primary">
                                 <div class="inner">
-                                    <h3 style="color:white;font-family:Rubik-Regular;">175</h3>
+                                    <h3 style="color:white;font-family:Rubik-Regular;"><asp:Label ID="lblWaitingApproval" runat="server" Text="0" /></h3>
                                     <p style="color:white;">Waiting Approval</p>
 
                                     <div class="icon" style="padding-top:15px;">
@@ -253,7 +295,7 @@
                         <div class="col-lg-2-4 col-xs-12" id="div5" runat="server">
                             <div class="small-box bg-black">
                                 <div class="inner">
-                                    <h3 style="color:white;font-family:Rubik-Regular;">10</h3>
+                                    <h3 style="color:white;font-family:Rubik-Regular;"><asp:Label ID="lblRejected" runat="server" Text="0" /></h3>
                                     <p style="color:white;">Rejected</p>
 
                                     <div class="icon" style="padding-top:15px; color: rgba(255, 255, 255, 0.3);">
@@ -265,7 +307,7 @@
                         <div class="col-lg-2-4 col-xs-12" id="div6" runat="server">
                             <div class="small-box bg-green">
                                 <div class="inner">
-                                    <h3 style="color:white;font-family:Rubik-Regular;">75</h3>
+                                    <h3 style="color:white;font-family:Rubik-Regular;"><asp:Label ID="lblDone" runat="server" Text="0" /></h3>
                                     <p style="color:white;">Done</p>
 
                                     <div class="icon" style="padding-top:15px;">
@@ -275,34 +317,45 @@
                             </div>
                         </div>
                     </div>
+
+                    <!-- Chart Section -->
+                    <div class="chart-section row mt-4" style="margin-top: 20px;">
+                        <div class="card">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h4 class="mb-0">Grafik Perbandingan Jumlah Work Order Request</h4>
+                                <div class="chart-dropdown-wrapper d-flex align-items-center">
+                                    <label for="ddlTahunChart1" class="me-2 mb-0">Tahun:</label>
+                                    <asp:DropDownList ID="ddlTahunChart1" runat="server" AutoPostBack="true" OnSelectedIndexChanged="ddlTahunChart1_SelectedIndexChanged" CssClass="form-control select2" />
+                                </div>
+                            </div>
+      
+                            <div class="card-body">
+                                <asp:Literal ID="grafikDataJSON" runat="server" Visible="false" />
+                                <canvas id="grafikChart1" style="width: 100%; height: 500px;"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="chart-section row mt-4" style="margin-top: 20px;">
+                        <div class="card">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h4 class="mb-0">Grafik Jumlah Kerusakkan Mold dan Tool</h4>
+                                <div class="chart-dropdown-wrapper d-flex align-items-center">
+                                    <label for="ddlTahunChart2" class="me-2 mb-0">Tahun:</label>
+                                    <asp:DropDownList ID="ddlTahunChart2" runat="server" AutoPostBack="true" CssClass="form-control select2" />
+                                </div>
+                            </div>
+
+                            <div class="card-body">
+                                <canvas id="grafikChart2" style="width: 100%; height: 500px;"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
                   </div>
                 </div>
 
-
-                      <div style="padding: 20px; max-width: 100vw; margin: 0 auto; background: #f8f9fa;">
-                        <h4 class="text-center mb-4" style="font-weight: 600;">Grafik Dashboard Request</h4>                          
-                        <!-- Wrapper kedua chart -->
-                        <div style="display: flex; flex-direction: column; align-items: center; gap: 60px; padding: 20px;">
-
-                          <!-- Chart 1 -->
-                          <div class="card" style="background-color: white; box-shadow: 0 3px 10px rgba(0,0,0,0.15); border-radius: 12px; width: 100%; max-width: 1200px;">
-                            <div class="card-body p-4">
-                              <canvas id="grafikChart1" style="width: 100%; height: 500px;"></canvas>
-                              <asp:Literal ID="grafikDataJSON" runat="server" Visible="false" />
-                            </div>
-                          </div>
-
-                          <!-- Chart 2 -->
-                          <div class="card" style="background-color: white; box-shadow: 0 3px 10px rgba(0,0,0,0.15); border-radius: 12px; width: 100%; max-width: 1200px;">
-                            <div class="card-body p-4">
-                              <canvas id="grafikChart2" style="width: 100%; height: 500px;"></canvas>
-                              <asp:Literal ID="Literal1" runat="server" Visible="false" />
-                            </div>
-                          </div>
-
-                        </div>
-                      </div>
-                      </div>
+              </div>
 
           </div>
         </section>
@@ -314,28 +367,39 @@
 
     <!-- Script untuk inisialisasi grafik -->
         <script>
-            // Contoh data dummy, biasanya dari server (ASP.NET binding)
-            var data = {
-                labels: ['01 Jan', '02 Jan', '03 Jan'],
-                values: [5, 10, 7]
-            };
+            const grafikData = <%= grafikDataJSON.Text %>;
 
-            var ctx1 = document.getElementById('grafikChart1').getContext('2d');
-            var chart1 = new Chart(ctx1, {
+            console.log("Isi grafikData:", grafikData);
+
+            const ctx1 = document.getElementById('grafikChart1').getContext('2d');
+            const chart1 = new Chart(ctx1, {
                 type: 'bar',
                 data: {
-                    labels: data.labels,
-                    datasets: [{
-                        label: 'Work Order',
-                        data: data.values,
-                        backgroundColor: 'rgba(54, 162, 235, 0.6)'
-                    }]
+                    labels: grafikData.labels,
+                    datasets: [
+                        {
+                            label: 'Progress',
+                            data: grafikData.progress,
+                            backgroundColor: 'rgba(255, 99, 132, 0.6)'
+                        },
+                        {
+                            label: 'Done',
+                            data: grafikData.done,
+                            backgroundColor: 'rgba(75, 192, 192, 0.6)'
+                        }
+                    ]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'top' }
+                    },
                     scales: {
-                        y: { beginAtZero: true, ticks: { stepSize: 1 } }
+                        y: {
+                            beginAtZero: true,
+                            ticks: { stepSize: 1 }
+                        }
                     }
                 }
             });
@@ -429,35 +493,7 @@
             // Inisialisasi: sembunyikan grafik saat pertama kali halaman dibuka
             $('#grafikContainer').hide();
         });
-    </script>
 
-    <!-- Script Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-    <!-- Script untuk inisialisasi grafik -->
-    <script>
-        // Contoh data dummy, biasanya dari server (ASP.NET binding)
-        var data = {
-            labels: ['01 Jan', '02 Jan', '03 Jan'],
-            values: [5, 10, 7]
-        };
-
-        var ctx = document.getElementById('grafikChart1').getContext('2d');
-        var chart = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: data.labels,
-                datasets: [{
-                    label: 'Jumlah Request',
-                    data: data.values,
-                    backgroundColor: 'rgba(75, 192, 192, 0.5)'
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false
-            }
-        });
     </script>
    
     <!--script type="text/javascript">

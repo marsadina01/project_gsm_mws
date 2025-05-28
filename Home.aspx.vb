@@ -1,11 +1,12 @@
 ﻿
 Imports System.Data
 Imports System.Data.SqlClient
+Imports System.Security.Cryptography
 Imports System.Web.Script.Serialization
 
 Partial Class Home
     Inherits System.Web.UI.Page
-    Dim connStr As String = ConfigurationManager.ConnectionStrings("Conn").ToString()
+    Dim connStr As String = DecryptString(ConfigurationManager.ConnectionStrings("Conn").ToString())
 
     Protected Sub Page_Load(ByVal sender As Object, ByVal e As EventArgs) Handles Me.Load
         If Session("role") Is Nothing Then
@@ -17,8 +18,19 @@ Partial Class Home
         End If
 
         If Not IsPostBack Then
-            Dim jsonData As String = "[{""label"": ""01 Jan"", ""value"": 5}, {""label"": ""02 Jan"", ""value"": 3}]"
-            grafikDataJSON.Text = jsonData
+            Dim tahun As Integer = Date.Now.Year
+            Dim bulan As Integer = Date.Now.Month
+
+            For year As Integer = tahun To 2020 Step -1
+                ddlTahunChart1.Items.Add(New ListItem(year.ToString(), year.ToString()))
+                ddlTahunChart2.Items.Add(New ListItem(year.ToString(), year.ToString()))
+            Next
+
+            ddlTahunChart1.SelectedValue = tahun.ToString()
+            ddlTahunChart2.SelectedValue = tahun.ToString()
+
+            LoadDashboardCards(tahun, bulan)
+            LoadChartData(tahun)
         End If
         ClientScript.RegisterStartupScript(Me.GetType, "ModalScript", "$(function(){$('#modal-faktur').modal('show'); });", True)
 
@@ -57,42 +69,101 @@ Partial Class Home
 
     End Sub
 
-    'Private Sub BindGrafikData()
-    '    Dim dt As New DataTable()
-
-    '    Using conn As New SqlConnection(connStr)
-    '        Dim cmd As New SqlCommand("SELECT TOP 10 RequestDate, TotalRequest FROM GrafikDashboard ORDER BY RequestDate DESC", conn)
-    '        Dim adapter As New SqlDataAdapter(cmd)
-    '        adapter.Fill(dt)
-    '    End Using
-
-    '    ' Konversi ke JSON dan simpan ke hidden field atau literal
-    '    Dim serializer As New JavaScriptSerializer()
-    '    Dim jsonData As String = serializer.Serialize(From row In dt.AsEnumerable()
-    '                                                  Select New With {
-    '                                                      .label = row.Field(Of DateTime)("RequestDate").ToString("dd MMM"),
-    '                                                      .value = row.Field(Of Integer)("TotalRequest")
-    '                                                  })
-
-    '    grafikDataJSON.Text = jsonData
-    'End Sub
-
-    Private Sub BindGrafikData()
-        ' Data statis untuk uji coba chart
-        Dim jsonData As String = "[" &
-        "{""label"": ""01 Jan"", ""value"": 5}," &
-        "{""label"": ""02 Jan"", ""value"": 8}," &
-        "{""label"": ""03 Jan"", ""value"": 3}," &
-        "{""label"": ""04 Jan"", ""value"": 10}," &
-        "{""label"": ""05 Jan"", ""value"": 6}," &
-        "{""label"": ""06 Jan"", ""value"": 4}," &
-        "{""label"": ""07 Jan"", ""value"": 9}" &
-        "]"
-
-        ' Bungkus dalam tag <script> agar bisa dibaca oleh JavaScript
-        grafikDataJSON.Text = "<script>var grafikData = " & jsonData & ";</script>"
+    Protected Sub ddlTahunChart1_SelectedIndexChanged(sender As Object, e As EventArgs)
+        Dim selectedYear As Integer = Convert.ToInt32(ddlTahunChart1.SelectedValue)
+        LoadChartData(selectedYear)
     End Sub
 
+    Private Sub LoadChartData(tahun As Integer)
+        Dim progress(11) As Integer
+        Dim done(11) As Integer
+
+        Using conn As New SqlConnection(connStr)
+            Using cmd As New SqlCommand("sp_getchart_workorder", conn)
+                cmd.CommandType = CommandType.StoredProcedure
+                cmd.Parameters.AddWithValue("@tahun", tahun)
+
+                conn.Open()
+                Using reader As SqlDataReader = cmd.ExecuteReader()
+                    While reader.Read()
+                        Dim monthIndex As Integer = Convert.ToInt32(reader("work_month")) - 1
+                        Dim statusGroup As String = reader("status_group").ToString()
+                        Dim total As Integer = Convert.ToInt32(reader("total"))
+
+                        If statusGroup = "progress" Then
+                            progress(monthIndex) = total
+                        ElseIf statusGroup = "done" Then
+                            done(monthIndex) = total
+                        End If
+                    End While
+                End Using
+            End Using
+        End Using
+
+        ' Format dan kirim JSON ke literal
+        Dim months = New String() {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"}
+        Dim data = New With {
+            .labels = months,
+            .progress = progress,
+            .done = done
+        }
+
+        Dim serializer As New JavaScriptSerializer()
+        Dim jsonData As String = serializer.Serialize(data)
+        grafikDataJSON.Text = jsonData
+    End Sub
+
+    Private Sub LoadDashboardCards(tahun As Integer, bulan As Integer)
+        Using conn As New SqlConnection(connStr)
+            Using cmd As New SqlCommand("sp_get_card_dashboard", conn)
+                cmd.CommandType = CommandType.StoredProcedure
+                cmd.Parameters.AddWithValue("@tahun", tahun)
+                cmd.Parameters.AddWithValue("@bulan", bulan)
+
+                conn.Open()
+                Using reader As SqlDataReader = cmd.ExecuteReader()
+                    ' Reset nilai awal
+                    lblWaitingApproval.Text = "0"
+                    lblNeedResponse.Text = "0"
+                    lblOnProgress.Text = "0"
+                    lblDone.Text = "0"
+                    lblRejected.Text = "0"
+
+                    While reader.Read()
+                        Dim groupStatus As String = reader("status_group").ToString()
+                        Dim total As Integer = Convert.ToInt32(reader("total"))
+
+                        Select Case groupStatus
+                            Case "Waiting Approval"
+                                lblWaitingApproval.Text = total.ToString()
+                            Case "Need Response"
+                                lblNeedResponse.Text = total.ToString()
+                            Case "On Progress"
+                                lblOnProgress.Text = total.ToString()
+                            Case "Done"
+                                lblDone.Text = total.ToString()
+                            Case "Rejected"
+                                lblRejected.Text = total.ToString()
+                        End Select
+                    End While
+                End Using
+            End Using
+        End Using
+    End Sub
+
+    Public Shared Function DecryptString(ByVal encryptedString As String) As String
+        Dim DES As New TripleDESCryptoServiceProvider
+        Dim mKey As String = "PasswordKey"
+        DES.Key = MD5Hash(mKey)
+        DES.Mode = CipherMode.ECB
+        Dim Buffer As Byte() = Convert.FromBase64String(encryptedString)
+        Return ASCIIEncoding.ASCII.GetString(DES.CreateDecryptor().TransformFinalBlock(Buffer, 0, Buffer.Length))
+    End Function
+
+    Public Shared Function MD5Hash(ByVal value As String) As Byte()
+        Dim MD5 As New MD5CryptoServiceProvider
+        Return MD5.ComputeHash(ASCIIEncoding.ASCII.GetBytes(value))
+    End Function
 
     Protected Sub Page_Unload(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Unload
         Session.Remove("url_det")
