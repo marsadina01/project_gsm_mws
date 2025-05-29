@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="bower_components/select2/dist/css/select2.min.css"/>
     <link rel="stylesheet" href="dist/css/AdminLTE.min.css"/>
     <link rel="stylesheet" href="dist/css/skins/_all-skins.min.css"/>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <style>
         @media (min-width: 992px) {
@@ -340,47 +341,47 @@
                 }
             });
 
-            var ctx2 = document.getElementById('grafikChart2').getContext('2d');
-            var chart2 = new Chart(ctx2, {
-                type: 'bar',
-                data: {
-                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May'],
-                    datasets: [
-                        {
-                            label: 'Departemen A',
-                            data: [10, 15, 9, 12, 14],
-                            backgroundColor: 'rgba(255, 99, 132, 0.6)'
-                        },
-                        {
-                            label: 'Departemen B',
-                            data: [8, 13, 11, 9, 10],
-                            backgroundColor: 'rgba(54, 162, 235, 0.6)'
-                        },
-                        {
-                            label: 'Departemen C',
-                            data: [5, 7, 8, 6, 7],
-                            backgroundColor: 'rgba(75, 192, 192, 0.6)'
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            position: 'top'
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            ticks: {
-                                stepSize: 1
-                            }
-                        }
-                    }
-                }
-            });
+            //var ctx2 = document.getElementById('grafikChart2').getContext('2d');
+            //var chart2 = new Chart(ctx2, {
+            //    type: 'bar',
+            //    data: {
+            //        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May'],
+            //        datasets: [
+            //            {
+            //                label: 'Departemen A',
+            //                data: [10, 15, 9, 12, 14],
+            //                backgroundColor: 'rgba(255, 99, 132, 0.6)'
+            //            },
+            //            {
+            //                label: 'Departemen B',
+            //                data: [8, 13, 11, 9, 10],
+            //                backgroundColor: 'rgba(54, 162, 235, 0.6)'
+            //            },
+            //            {
+            //                label: 'Departemen C',
+            //                data: [5, 7, 8, 6, 7],
+            //                backgroundColor: 'rgba(75, 192, 192, 0.6)'
+            //            }
+            //        ]
+            //    },
+            //    options: {
+            //        responsive: true,
+            //        maintainAspectRatio: false,
+            //        plugins: {
+            //            legend: {
+            //                position: 'top'
+            //            }
+            //        },
+            //        scales: {
+            //            y: {
+            //                beginAtZero: true,
+            //                ticks: {
+            //                    stepSize: 1
+            //                }
+            //            }
+            //        }
+            //    }
+            //});
         </script>
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
