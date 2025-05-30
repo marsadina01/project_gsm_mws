@@ -18,7 +18,7 @@ Partial Class Home
         End If
 
         If Not IsPostBack Then
-            Dim chartDataJson As String = GetChartData()
+            Dim chartDataJson As String = GetChartData(Now.Year.ToString())
 
             Dim script As String = "<script>" &
                                "var ctx2 = document.getElementById('grafikChart2').getContext('2d');" &
@@ -76,7 +76,9 @@ Partial Class Home
 
     End Sub
 
-    Private Function GetChartData() As String
+
+    Public Shared Function GetChartData(tahun As String) As Object
+        Dim connStr As String = DecryptString(ConfigurationManager.ConnectionStrings("Conn").ToString())
         Dim result As New Dictionary(Of String, Object)
         Dim labels As New List(Of String)
         Dim datasets As New List(Of Dictionary(Of String, Object))
@@ -85,6 +87,7 @@ Partial Class Home
         Using conn As New SqlConnection(connStr)
             Using cmd As New SqlCommand("sp_GetMoldToolCountPerMonth", conn)
                 cmd.CommandType = CommandType.StoredProcedure
+                cmd.Parameters.AddWithValue("@tahun", tahun) ' <- Tambahkan parameter tahun di SP
                 conn.Open()
 
                 Using da As New SqlDataAdapter(cmd)

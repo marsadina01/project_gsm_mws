@@ -294,13 +294,22 @@
                           </div>
 
                           <!-- Chart 2 -->
-                          <div class="card" style="background-color: white; box-shadow: 0 3px 10px rgba(0,0,0,0.15); border-radius: 12px; width: 100%; max-width: 1200px;">
-                            <div class="card-body p-4">
-                              <canvas id="grafikChart2" style="width: 100%; height: 500px;"></canvas>
-                              <asp:Literal ID="Literal1" runat="server" Visible="false" />
-                            </div>
-                          </div>
+                            <div class="card" style="background-color: white; box-shadow: 0 3px 10px rgba(0,0,0,0.15); border-radius: 12px; width: 100%; max-width: 1200px;">
+                              <div class="card-body p-4">
+                                <asp:ScriptManager ID="ScriptManager1" runat="server" />
+    
+                                <asp:UpdatePanel ID="UpdatePanelChart" runat="server">
+                                  <ContentTemplate>
+                                    <canvas id="grafikChart2" style="max-height:400px; width:100%;"></canvas>
+                                    <asp:Literal ID="Literal1" runat="server" Visible="true" />
+                                  </ContentTemplate>
+<%--                                  <Triggers>
+                                    <asp:AsyncPostBackTrigger ControlID="ddlTahun" EventName="SelectedIndexChanged" />
+                                  </Triggers>--%>
+                                </asp:UpdatePanel>
 
+                              </div>
+                            </div>
                         </div>
                       </div>
                       </div>
@@ -313,76 +322,6 @@
     <!-- Script Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-    <!-- Script untuk inisialisasi grafik -->
-        <script>
-            // Contoh data dummy, biasanya dari server (ASP.NET binding)
-            var data = {
-                labels: ['01 Jan', '02 Jan', '03 Jan'],
-                values: [5, 10, 7]
-            };
-
-            var ctx1 = document.getElementById('grafikChart1').getContext('2d');
-            var chart1 = new Chart(ctx1, {
-                type: 'bar',
-                data: {
-                    labels: data.labels,
-                    datasets: [{
-                        label: 'Work Order',
-                        data: data.values,
-                        backgroundColor: 'rgba(54, 162, 235, 0.6)'
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        y: { beginAtZero: true, ticks: { stepSize: 1 } }
-                    }
-                }
-            });
-
-            //var ctx2 = document.getElementById('grafikChart2').getContext('2d');
-            //var chart2 = new Chart(ctx2, {
-            //    type: 'bar',
-            //    data: {
-            //        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May'],
-            //        datasets: [
-            //            {
-            //                label: 'Departemen A',
-            //                data: [10, 15, 9, 12, 14],
-            //                backgroundColor: 'rgba(255, 99, 132, 0.6)'
-            //            },
-            //            {
-            //                label: 'Departemen B',
-            //                data: [8, 13, 11, 9, 10],
-            //                backgroundColor: 'rgba(54, 162, 235, 0.6)'
-            //            },
-            //            {
-            //                label: 'Departemen C',
-            //                data: [5, 7, 8, 6, 7],
-            //                backgroundColor: 'rgba(75, 192, 192, 0.6)'
-            //            }
-            //        ]
-            //    },
-            //    options: {
-            //        responsive: true,
-            //        maintainAspectRatio: false,
-            //        plugins: {
-            //            legend: {
-            //                position: 'top'
-            //            }
-            //        },
-            //        scales: {
-            //            y: {
-            //                beginAtZero: true,
-            //                ticks: {
-            //                    stepSize: 1
-            //                }
-            //            }
-            //        }
-            //    }
-            //});
-        </script>
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
@@ -461,22 +400,4 @@
         });
     </script>
    
-    <!--script type="text/javascript">
-    var url = window.location;
-        // for sidebar menu entirely but not cover treeview
-        $('ul.sidebar-menu a').filter(function() {
-            return this.href != url;
-        }).parent().removeClass('active');
-
-        // for sidebar menu entirely but not cover treeview
-        $('ul.sidebar-menu a').filter(function() {
-            return this.href == url;
-        }).parent().addClass('active');
-
-        // for treeview
-        $('ul.treeview-menu a').filter(function() {
-            return this.href == url;
-        }).parentsUntil(".sidebar-menu > .treeview-menu").addClass('active');
-    </script!-->
 </asp:Content>
-
