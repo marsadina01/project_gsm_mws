@@ -53,6 +53,15 @@
             return false;
         }
 
+        function validateForm() {
+            var analisa = document.getElementById('<%= txtanalisa.ClientID %>').value.trim();
+            var perbaikan = document.getElementById('<%= txtperbaikan.ClientID %>').value.trim();
+            if (analisa === "" || perbaikan === "") {
+                alert("Analisa Kejadian dan Perbaikan wajib diisi!");
+                return false;
+            }
+            return true;
+        }
 
         function setActive(button) {
             var buttons = document.querySelectorAll(".custom-dark-btn");
@@ -465,7 +474,7 @@
 
 
 
-            <div class="box">
+            <div class="box" id="boxLampiran1" runat="server" visible="false">
                 <div class="box-body text-left">
                     <asp:HyperLink ID="lnkLampiran" runat="server" onClick="showLampiranModal" CssClass="btn lampiran-btn" Visible="false">
                         Lihat Lampiran
@@ -520,13 +529,13 @@
                             <input type="file" id="fileInput" style="display: none;" />
                             <asp:FileUpload ID="fuLampiran" runat="server" />
     <%--                        <asp:Button ID="btnUpload" runat="server" Text="Upload File" OnClick="btnUpload_Click" CssClass="btn btn-primary" />--%>
-                            <asp:Label ID="lblMessage" runat="server" ForeColor="Red"></asp:Label>
+                            <asp:Label ID="lblMessage" runat="server" ForeColor="Red" Text="Format file berupa JPG, JPEG, PNG, dan PDF"></asp:Label>
                         </div>
                     </div>
                 </div>
              </div>
 
-            <div class="box">
+            <div class="box" id="boxLampiran2" runat="server" visible="false">
                 <div class="box-body text-left">
                     <asp:HyperLink ID="lnkLampiran2" runat="server" onClick="showLampiranModal" CssClass="btn lampiran-btn" Visible="false">
                         Lihat Lampiran WO
@@ -572,8 +581,8 @@
                     OnClientClick="return showRejectReason();"
                     OnClick="btnReject_Click" />
                 <asp:Button ID="btnApprove" runat="server" class="btn btn-success" Text="Approve" OnClick="btnApprove_Click" />
-                <asp:Button ID="btnBack" runat="server" class="btn btn-danger custom-btn" Text="Back" OnClick="btnBack_Click" />
-                <asp:Button ID="btnClose" runat="server" CssClass="btn btn-primary" Text="Close WO" OnClick="btnClose_Click" />
+                <asp:Button ID="btnBack" runat="server" class="btn btn-danger custom-btn" Text="Kembali" OnClick="btnBack_Click" />
+                <asp:Button ID="btnClose" runat="server" CssClass="btn btn-primary" Text="Close WO" OnClientClick="return validateForm();" OnClick="btnClose_Click" />
                 <asp:Button ID="btnUpdate" runat="server" CssClass="btn btn-success" Text="Update" Onclick="btnUpdate_Click" />
 <%--                <asp:Label ID="lblDebug" runat="server" ForeColor="Red" />--%>
 
