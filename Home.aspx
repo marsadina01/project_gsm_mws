@@ -83,7 +83,7 @@
               <li class="nav-item">
                 <a class="nav-link active" id="tabMenu-tab" data-toggle="tab" href="#tabMenu" role="tab" aria-controls="tabMenu" aria-selected="true">Menu</a>
               </li>
-              <li class="nav-item">
+              <li class="nav-item" id="listgrafik" runat="server">
                 <a class="nav-link" id="tabGrafik-tab" data-toggle="tab" href="#tabGrafik" role="tab" aria-controls="tabGrafik" aria-selected="false">Grafik Request</a>
               </li>
             </ul>
