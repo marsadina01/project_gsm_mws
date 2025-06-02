@@ -19,6 +19,12 @@ Partial Class ViewWorkOrder
 
         If Not IsPostBack Then
             data(isFirstLoad:=True)
+
+            If Not Session("role") = "requester" Then
+                btnAdd.Visible = False
+
+            End If
+
         End If
     End Sub
 
@@ -183,7 +189,7 @@ Partial Class ViewWorkOrder
 
             ' Commit jika semua berhasil
             transaction.Commit()
-            Return "WO telah direspons."
+            Return "Work Order telah direspons."
         Catch ex As Exception
             ' Rollback jika ada error
             If transaction IsNot Nothing Then
@@ -230,7 +236,7 @@ Partial Class ViewWorkOrder
 
             ' Commit jika semua berhasil
             transaction.Commit()
-            Return "WO telah dibatalkan."
+            Return "Work Order telah dibatalkan."
         Catch ex As Exception
             ' Rollback jika ada error
             If transaction IsNot Nothing Then
