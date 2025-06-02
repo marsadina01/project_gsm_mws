@@ -20,23 +20,20 @@ Partial Class Home
         If Not IsPostBack Then
             Dim chartDataJson As String = GetChartData(Now.Year.ToString())
 
-            Dim script As String = "<script>" &
-                               "var ctx2 = document.getElementById('grafikChart2').getContext('2d');" &
-                               "var chartData = " & chartDataJson & ";" &
-                               "var chart2 = new Chart(ctx2, {" &
-                               "type: 'bar'," &
-                               "data: chartData," &
-                               "options: {" &
-                               "responsive: true," &
-                               "maintainAspectRatio: false," &
-                               "plugins: { legend: { position: 'top' } }," &
-                               "scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }" &
-                               "}" &
-                               "});" &
-                               "</script>"
+            Dim tahun As Integer = Date.Now.Year
+            Dim bulan As Integer = Date.Now.Month
 
-            Literal1.Text = script
-            Literal1.Visible = True
+            For year As Integer = tahun To 2020 Step -1
+                ddlTahunChart1.Items.Add(New ListItem(year.ToString(), year.ToString()))
+                ddlTahunChart2.Items.Add(New ListItem(year.ToString(), year.ToString()))
+            Next
+
+            ddlTahunChart1.SelectedValue = tahun.ToString()
+            ddlTahunChart2.SelectedValue = tahun.ToString()
+
+            LoadDashboardCards(tahun, bulan)
+            LoadChartData(tahun)
+            Literal1.Text = GetChartData(Convert.ToInt32(ddlTahunChart2.SelectedValue))
         End If
 
         ClientScript.RegisterStartupScript(Me.GetType, "ModalScript", "$(function(){$('#modal-faktur').modal('show'); });", True)
@@ -76,52 +73,140 @@ Partial Class Home
 
     End Sub
 
-
-    Public Shared Function GetChartData(tahun As String) As Object
+    Public Shared Function GetChartData(tahun As Integer) As String
         Dim connStr As String = DecryptString(ConfigurationManager.ConnectionStrings("Conn").ToString())
-        Dim result As New Dictionary(Of String, Object)
-        Dim labels As New List(Of String)
-        Dim datasets As New List(Of Dictionary(Of String, Object))
-        Dim dt As New DataTable()
+
+        Dim moldData(11) As Integer
+        Dim toolingData(11) As Integer
 
         Using conn As New SqlConnection(connStr)
             Using cmd As New SqlCommand("sp_GetMoldToolCountPerMonth", conn)
                 cmd.CommandType = CommandType.StoredProcedure
-                cmd.Parameters.AddWithValue("@tahun", tahun) ' <- Tambahkan parameter tahun di SP
+                cmd.Parameters.AddWithValue("@tahun", tahun)
                 conn.Open()
 
-                Using da As New SqlDataAdapter(cmd)
-                    da.Fill(dt)
+                Using reader As SqlDataReader = cmd.ExecuteReader()
+                    While reader.Read()
+                        ' period format: yyyy-MM, kita ambil bulan saja
+                        Dim period As String = reader("period").ToString() ' misal "2025-03"
+                        Dim bulan As Integer = Convert.ToInt32(period.Substring(5, 2)) - 1 ' 0-based index bulan
+
+                        Dim jenis As String = reader("mt_name").ToString()
+                        Dim total As Integer = Convert.ToInt32(reader("total"))
+
+                        If jenis = "Mold" Then
+                            moldData(bulan) = total
+                        ElseIf jenis = "Tooling" Then
+                            toolingData(bulan) = total
+                        End If
+                    End While
                 End Using
             End Using
         End Using
 
-        ' Ambil semua bulan (distinct)
-        Dim bulanSet = dt.AsEnumerable().Select(Function(r) r.Field(Of String)("period")).Distinct().ToList()
-        labels = bulanSet
+        Dim months = New String() {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"}
 
-        ' Ambil semua jenis mold_type_name (Mold/Tooling)
-        Dim jenisSet = dt.AsEnumerable().Select(Function(r) r.Field(Of String)("mt_name")).Distinct()
-        For Each jenis In jenisSet
-            Dim dataset As New Dictionary(Of String, Object)
-            dataset("label") = jenis
-            dataset("backgroundColor") = If(jenis = "Mold", "rgba(128, 0, 128, 0.6)", "rgba(0, 128, 0, 0.6)")
-            dataset("data") = (
-        From b In bulanSet
-        Let row = dt.AsEnumerable().FirstOrDefault(Function(r) r.Field(Of String)("period") = b AndAlso r.Field(Of String)("mt_name") = jenis)
-        Select If(row IsNot Nothing, row.Field(Of Integer)("total"), 0)
-    ).ToList()
+        Dim datasets = New List(Of Object) From {
+        New With {.label = "Mold", .backgroundColor = "rgba(128, 0, 128, 0.6)", .data = moldData},
+        New With {.label = "Tooling", .backgroundColor = "rgba(0, 128, 0, 0.6)", .data = toolingData}
+    }
 
-            datasets.Add(dataset)
-        Next
-
-
-        result("labels") = labels
-        result("datasets") = datasets
+        Dim result = New With {
+        .labels = months,
+        .datasets = datasets
+    }
 
         Dim js As New JavaScriptSerializer()
         Return js.Serialize(result)
     End Function
+
+    Protected Sub ddlTahunChart2_SelectedIndexChanged(sender As Object, e As EventArgs)
+        Dim selectedYear As Integer = Convert.ToInt32(ddlTahunChart2.SelectedValue)
+        Literal1.Text = GetChartData(selectedYear)
+    End Sub
+
+    Protected Sub ddlTahunChart1_SelectedIndexChanged(sender As Object, e As EventArgs)
+        Dim selectedYear As Integer = Convert.ToInt32(ddlTahunChart1.SelectedValue)
+        LoadChartData(selectedYear)
+    End Sub
+
+    Private Sub LoadChartData(tahun As Integer)
+        Dim progress(11) As Integer
+        Dim done(11) As Integer
+
+        Using conn As New SqlConnection(connStr)
+            Using cmd As New SqlCommand("sp_getchart_workorder", conn)
+                cmd.CommandType = CommandType.StoredProcedure
+                cmd.Parameters.AddWithValue("@tahun", tahun)
+
+                conn.Open()
+                Using reader As SqlDataReader = cmd.ExecuteReader()
+                    While reader.Read()
+                        Dim monthIndex As Integer = Convert.ToInt32(reader("work_month")) - 1
+                        Dim statusGroup As String = reader("status_group").ToString()
+                        Dim total As Integer = Convert.ToInt32(reader("total"))
+
+                        If statusGroup = "progress" Then
+                            progress(monthIndex) = total
+                        ElseIf statusGroup = "done" Then
+                            done(monthIndex) = total
+                        End If
+                    End While
+                End Using
+            End Using
+        End Using
+
+        ' Format dan kirim JSON ke literal
+        Dim months = New String() {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"}
+        Dim data = New With {
+            .labels = months,
+            .progress = progress,
+            .done = done
+        }
+
+        Dim serializer As New JavaScriptSerializer()
+        Dim jsonData As String = serializer.Serialize(data)
+        grafikDataJSON.Text = jsonData
+    End Sub
+
+    Private Sub LoadDashboardCards(tahun As Integer, bulan As Integer)
+        Using conn As New SqlConnection(connStr)
+            Using cmd As New SqlCommand("sp_get_card_dashboard", conn)
+                cmd.CommandType = CommandType.StoredProcedure
+                cmd.Parameters.AddWithValue("@tahun", tahun)
+                cmd.Parameters.AddWithValue("@bulan", bulan)
+
+                conn.Open()
+                Using reader As SqlDataReader = cmd.ExecuteReader()
+                    ' Reset nilai awal
+                    lblWaitingApproval.Text = "0"
+                    lblNeedResponse.Text = "0"
+                    lblOnProgress.Text = "0"
+                    lblDone.Text = "0"
+                    lblRejected.Text = "0"
+
+                    While reader.Read()
+                        Dim groupStatus As String = reader("status_group").ToString()
+                        Dim total As Integer = Convert.ToInt32(reader("total"))
+
+                        Select Case groupStatus
+                            Case "Waiting Approval"
+                                lblWaitingApproval.Text = total.ToString()
+                            Case "Need Response"
+                                lblNeedResponse.Text = total.ToString()
+                            Case "On Progress"
+                                lblOnProgress.Text = total.ToString()
+                            Case "Done"
+                                lblDone.Text = total.ToString()
+                            Case "Rejected"
+                                lblRejected.Text = total.ToString()
+                        End Select
+                    End While
+                End Using
+            End Using
+        End Using
+    End Sub
+
 
     Protected Sub Page_Unload(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Unload
         Session.Remove("url_det")
