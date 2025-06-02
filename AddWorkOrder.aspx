@@ -72,7 +72,7 @@
         function validateForm() {
             var kerusakan = document.getElementById('<%= txtKerusakan.ClientID %>').value.trim();
             if (kerusakan === "") {
-                alert("Gejala Kerusakan harus diisi!");
+                alert("Data wajib diisi bertanda (*)");
                 return false;
             }
             return true;
@@ -273,7 +273,7 @@
                         <input type="file" id="fileInput" style="display: none;" />
                         <asp:FileUpload ID="fuLampiran" runat="server" />
 <%--                        <asp:Button ID="btnUpload" runat="server" Text="Upload File" OnClick="btnUpload_Click" CssClass="btn btn-primary" />--%>
-                        <asp:Label ID="lblMessage" runat="server" ForeColor="Red"></asp:Label>
+                        <asp:Label ID="lblMessage" runat="server" ForeColor="Red" Text="Format file berupa JPG, JPEG, PNG, dan PDF"></asp:Label>
                     </div>
                 </div>
             </div>
