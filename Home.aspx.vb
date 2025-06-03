@@ -46,6 +46,7 @@ Partial Class Home
                 linkdok2.NavigateUrl = "T_DokInternal.aspx"
                 amonitoring.NavigateUrl = "Delivery_Harian.aspx"
                 asmonitoring.NavigateUrl = "Delivery_Harian.aspx"
+                listgrafik.Visible = True
                 Exit Select
             Case ("admin")
                 adoc.NavigateUrl = "gps_home.aspx"
@@ -56,6 +57,7 @@ Partial Class Home
                 linkdok2.NavigateUrl = "T_DokInternal.aspx"
                 amonitoring.NavigateUrl = "Delivery_Harian.aspx"
                 asmonitoring.NavigateUrl = "Delivery_Harian.aspx"
+                listgrafik.Visible = True
                 Exit Select
             Case "requester", "atsreq", "teknisiSup", "atstekSup", "teknisiGS", "atstekGS"
                 divsetting.Visible = False
@@ -68,6 +70,7 @@ Partial Class Home
                 divprofile.Visible = False
                 divapp.Visible = False
                 div1.Visible = True
+                listgrafik.Visible = False
                 Exit Select
         End Select
 

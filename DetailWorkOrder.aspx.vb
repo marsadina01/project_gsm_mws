@@ -81,7 +81,7 @@ Partial Class DetailWorkOrder
                     fclose.Visible = False
                     btnApprove.Visible = False
                     btnReject.Visible = False
-                    btnBack.Visible = False
+                    btnBack.Visible = True
                     btnClose.Visible = False
                     btnUpdate.Visible = True ' requester bisa update/upload
                     lampiranwo.Visible = False
@@ -438,6 +438,7 @@ Partial Class DetailWorkOrder
         ' === Lampiran 1 ===
         If Not String.IsNullOrEmpty(fileName) Then
             Dim fileUrl As String = ResolveUrl(filePath & fileName)
+            boxLampiran1.Visible = True
             lnkLampiran.Visible = True
             lnkLampiran.NavigateUrl = "#"
             lnkLampiran.Attributes.Add("onclick", "showLampiranModal('" & fileUrl & "'); return false;")
@@ -449,6 +450,7 @@ Partial Class DetailWorkOrder
         ' === Lampiran WO ===
         If Not String.IsNullOrEmpty(fileNameWO) Then
             Dim fileUrlWO As String = ResolveUrl(filePath & fileNameWO)
+            boxLampiran2.Visible = True
             lnkLampiran2.Visible = True
             lnkLampiran2.NavigateUrl = "#"
             lnkLampiran2.Attributes.Add("onclick", "showLampiranModal('" & fileUrlWO & "'); return false;")
@@ -567,7 +569,7 @@ Partial Class DetailWorkOrder
         Dim currentStatus As Integer = GetWorkOrderStatus(worNo)
         Dim newStatus As Integer = 2 ' Default approve awal
         Dim levelLog As Integer = 1
-        Dim messageTitle As String = "Success!"
+        Dim messageTitle As String = "Sukses!"
         Dim messageText As String = "Anda telah menyetujui request ini"
         Dim messageIcon As String = "success"
 
@@ -740,8 +742,8 @@ Partial Class DetailWorkOrder
                 ' SweetAlert success
                 Dim script As String = "<script>" &
                "Swal.fire({" &
-               "    icon: 'error'," &
-               "    title: 'Rejected!'," &
+               "    icon: 'success'," &
+               "    title: 'Sukses!'," &
                "    text: 'Work Order telah ditolak'," &
                "    confirmButtonColor: '#d33'," &
                "    allowOutsideClick: false" &
@@ -810,12 +812,6 @@ Partial Class DetailWorkOrder
 
         End If
 
-        ' Validasi: Pastikan analisa dan perbaikan diisi
-        If String.IsNullOrEmpty(txtanalisa.Text.Trim()) OrElse String.IsNullOrEmpty(txtperbaikan.Text.Trim()) Then
-            Response.Write("<script>alert('Analisa dan Perbaikan harus diisi sebelum menutup WO!');</script>")
-            Exit Sub
-        End If
-
         If String.IsNullOrEmpty(worNo) OrElse String.IsNullOrEmpty(npk) Then
             Response.Write("<script>alert('Data tidak valid!');</script>")
             Exit Sub
@@ -859,7 +855,7 @@ Partial Class DetailWorkOrder
                 Dim script As String = "<script>" & Environment.NewLine &
                    "Swal.fire({" & Environment.NewLine &
                    "    icon: 'success'," & Environment.NewLine &
-                   "    title: 'Success!'," & Environment.NewLine &
+                   "    title: 'Sukses!'," & Environment.NewLine &
                    "    text: 'Anda telah menutup WO ini'," & Environment.NewLine &
                    "    confirmButtonColor: '#28a745'," & Environment.NewLine &
                    "    allowOutsideClick: false" & Environment.NewLine &
@@ -905,11 +901,12 @@ Partial Class DetailWorkOrder
         Dim currentStatus As Integer = GetWorkOrderStatus(worNo)
         Dim newStatus As Integer = 0
         Dim levelLog As Integer = 0
+        Dim skipLog As Boolean = False
 
         ' Menentukan status dan level berdasarkan role dan status saat ini
         If (currentStatus = 1 Or currentStatus = 7) AndAlso role = "requester" Then
             newStatus = 1
-            levelLog = 0
+            skipLog = True
         ElseIf currentStatus = 6 AndAlso (role = "teknisiSup" Or role = "teknisiGS") Then
             newStatus = 4
             levelLog = 3
@@ -941,21 +938,23 @@ Partial Class DetailWorkOrder
                     cmdUpdate.ExecuteNonQuery()
                 End Using
 
-                ' Insert ke t_detailworkorder untuk logging perubahan
-                Dim insertQuery As String = "INSERT INTO t_detailworkorder (dt_wor_no, dt_createby, dt_createdate, dt_level) " &
+                If Not skipLog Then
+                    ' Insert ke t_detailworkorder untuk logging perubahan
+                    Dim insertQuery As String = "INSERT INTO t_detailworkorder (dt_wor_no, dt_createby, dt_createdate, dt_level) " &
                                         "VALUES (@worNo, @npk, @updateDate, @levelLog)"
-                Using cmdInsert As New SqlCommand(insertQuery, conn, tran)
-                    cmdInsert.Parameters.AddWithValue("@worNo", worNo)
-                    cmdInsert.Parameters.AddWithValue("@npk", npk)
-                    cmdInsert.Parameters.AddWithValue("@updateDate", updateDate)
-                    cmdInsert.Parameters.AddWithValue("@levelLog", levelLog)
-                    cmdInsert.ExecuteNonQuery()
-                End Using
+                    Using cmdInsert As New SqlCommand(insertQuery, conn, tran)
+                        cmdInsert.Parameters.AddWithValue("@worNo", worNo)
+                        cmdInsert.Parameters.AddWithValue("@npk", npk)
+                        cmdInsert.Parameters.AddWithValue("@updateDate", updateDate)
+                        cmdInsert.Parameters.AddWithValue("@levelLog", levelLog)
+                        cmdInsert.ExecuteNonQuery()
+                    End Using
+                End If
 
                 tran.Commit()
                 Dim script As String = "Swal.fire({" & Environment.NewLine &
                "    icon: 'success'," & Environment.NewLine &
-               "    title: 'Success!'," & Environment.NewLine &
+               "    title: 'Sukses!'," & Environment.NewLine &
                "    text: 'Data request berhasil diupdate'," & Environment.NewLine &
                "    confirmButtonColor: '#28a745'," & Environment.NewLine &
                "    allowOutsideClick: false" & Environment.NewLine &

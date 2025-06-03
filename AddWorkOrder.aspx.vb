@@ -15,6 +15,10 @@ Partial Class AddWorkOrder
             Response.Redirect("default.aspx")
         End If
 
+        If Not Session("role") = "requester" Then
+            Response.Redirect("ViewWorkOrder.aspx")
+        End If
+
         If Not IsPostBack Then
             txtrequestor.Text = Session("namafull").ToString()
             ViewState("namafull") = txtrequestor.Text
@@ -256,7 +260,7 @@ Partial Class AddWorkOrder
             Dim script As String = "<script>" & Environment.NewLine &
                        "Swal.fire({" & Environment.NewLine &
                        "    icon: 'success'," & Environment.NewLine &
-                       "    title: 'Success!'," & Environment.NewLine &
+                       "    title: 'Sukses!'," & Environment.NewLine &
                        "    text: 'Data request berhasil ditambahkan'," & Environment.NewLine &
                        "    confirmButtonColor: '#28a745'," & Environment.NewLine &
                        "    allowOutsideClick: false" & Environment.NewLine &

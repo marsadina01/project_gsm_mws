@@ -170,9 +170,12 @@
                                 </div>
                             </div>
 
-                            <a type="button" class="btn btn-primary" href="AddWorkOrder.aspx">
-                                Add New
-                            </a>
+                            <div id="btnAdd" runat="server">
+                                <a type="button" class="btn btn-primary" href="AddWorkOrder.aspx">
+                                    Add New
+                                </a>
+                            </div>
+                            
                         </div>
                         
                         <div class="box-body">
