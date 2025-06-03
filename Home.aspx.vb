@@ -28,6 +28,7 @@ Partial Class Home
                 ddlTahunChart2.Items.Add(New ListItem(year.ToString(), year.ToString()))
             Next
 
+
             ddlTahunChart1.SelectedValue = tahun.ToString()
             ddlTahunChart2.SelectedValue = tahun.ToString()
 
