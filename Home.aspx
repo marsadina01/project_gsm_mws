@@ -430,7 +430,7 @@
             };
         </script>
 
-    <script>
+<%--    <script>
         document.addEventListener('DOMContentLoaded', function () {
             // Restore tab aktif dari localStorage
             var activeTabId = localStorage.getItem('activeTabId');
@@ -451,7 +451,7 @@
                 localStorage.setItem('activeTabId', e.target.id);
             });
         });
-    </script>
+    </script>--%>
 
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
