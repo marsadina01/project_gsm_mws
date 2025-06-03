@@ -44,7 +44,7 @@ Partial Class DetailWorkOrder
 
 
             ' Tampilkan tombol Edit Lampiran hanya jika status 6 atau 7
-            btnEditLampiran.Visible = (worStatus = 6 Or worStatus = 7)
+            btnEditLampiran.Visible = (worStatus = 1 Or worStatus = 4 Or worStatus = 6 Or worStatus = 7)
 
             ' Default: semua tetap disable
             EnableFormControls(False)
