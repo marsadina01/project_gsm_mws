@@ -167,6 +167,10 @@ Partial Class Home
         Dim serializer As New JavaScriptSerializer()
         Dim jsonData As String = serializer.Serialize(data)
         grafikDataJSON.Text = jsonData
+
+        ' Debug output, bisa kamu cek di Output Window VS
+        System.Diagnostics.Trace.WriteLine("LoadChartData tahun: " & tahun)
+        System.Diagnostics.Trace.WriteLine("JSON: " & jsonData)
     End Sub
 
     Private Sub LoadDashboardCards(tahun As Integer, bulan As Integer)

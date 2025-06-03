@@ -66,6 +66,8 @@
 </asp:Content>
 
 <asp:Content ID="Content2" ContentPlaceHolderID="ContentPlaceHolder1" Runat="Server">
+    <asp:HiddenField ID="hdActiveTab" runat="server" />
+
     <div class="content-wrapper">
         <section class="content-header">
             <h1 style="font-family:Rubik-Regular;">
@@ -322,54 +324,41 @@
                     <!-- Chart Section -->
                     <asp:ScriptManager ID="ScriptManager1" runat="server" />
 
-                    <!-- Chart Section 1 -->
-                    <asp:UpdatePanel ID="UpdatePanelChart1" runat="server">
-                        <ContentTemplate>
-                            <div class="chart-section row mt-4" style="margin-top: 20px;">
-                                <div class="card">
-                                    <div class="card-header d-flex justify-content-between align-items-center">
-                                        <h4 class="mb-0">Grafik Perbandingan Jumlah Work Order Request</h4>
-                                        <div class="chart-dropdown-wrapper d-flex align-items-center">
-                                            <label for="ddlTahunChart1" class="me-2 mb-0">Tahun:</label>
-                                            <asp:DropDownList ID="ddlTahunChart1" runat="server" AutoPostBack="true"
-                                                OnSelectedIndexChanged="ddlTahunChart1_SelectedIndexChanged"
-                                                CssClass="form-control select2" />
-                                        </div>
-                                    </div>
-
-                                    <div class="card-body">
-                                        <asp:Literal ID="grafikDataJSON" runat="server" Visible="false" />
-                                        <canvas id="grafikChart1" style="width: 100%; height: 500px;"></canvas>
-                                    </div>
+                    <!-- Chart 1 -->
+                    <div class="chart-section row mt-4" style="margin-top: 20px;">
+                        <div class="card">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h4 class="mb-0">Grafik Perbandingan Jumlah Work Order Request</h4>
+                                <div class="chart-dropdown-wrapper d-flex align-items-center">
+                                    <label for="ddlTahunChart1" class="me-2 mb-0">Tahun:</label>
+                                    <asp:DropDownList ID="ddlTahunChart1" runat="server" AutoPostBack="true" OnSelectedIndexChanged="ddlTahunChart1_SelectedIndexChanged" CssClass="form-control select2" />
                                 </div>
                             </div>
-                        </ContentTemplate>
-                    </asp:UpdatePanel>
+      
+                            <div class="card-body">
+                                <asp:Literal ID="grafikDataJSON" runat="server" Visible="false" />
+                                <canvas id="grafikChart1" style="width: 100%; height: 500px;"></canvas>
+                            </div>
+                        </div>
+                    </div>
 
-                    <!-- Chart Section 2 -->
-                    <asp:UpdatePanel ID="UpdatePanelChart2" runat="server">
-                        <ContentTemplate>
-                            <div class="chart-section row mt-4" style="margin-top: 20px;">
-                                <div class="card">
-                                    <div class="card-header d-flex justify-content-between align-items-center">
-                                        <h4 class="mb-0">Grafik Jumlah Kerusakkan Mold dan Tool</h4>
-                                        <div class="chart-dropdown-wrapper d-flex align-items-center">
-                                            <label for="ddlTahunChart2" class="me-2 mb-0">Tahun:</label>
-                                            <asp:DropDownList ID="ddlTahunChart2" runat="server" AutoPostBack="true"
-                                                OnSelectedIndexChanged="ddlTahunChart2_SelectedIndexChanged"
-                                                CssClass="form-control select2" />
-                                        </div>
-                                    </div>
-
-                                    <div class="card-body">
-                                        <asp:Literal ID="Literal1" runat="server" Visible="false" />
-                                        <canvas id="grafikChart2" style="width: 100%; height: 500px;"></canvas>
-                                    </div>
+                    <!-- Chart 2 -->
+                    <div class="chart-section row mt-4" style="margin-top: 20px;">
+                        <div class="card">
+                            <div class="card-header d-flex justify-content-center align-items-center">
+                                <h4 class="mb-0">Grafik Jumlah Kerusakan Mold dan Tool</h4>
+                                <div class="chart-dropdown-wrapper d-flex align-items-center">
+                                    <label for="ddlTahunChart2" class="me-2 mb-0">Tahun:</label>
+                                    <asp:DropDownList ID="ddlTahunChart2" runat="server" AutoPostBack="true"
+                                        CssClass="form-control select2" OnSelectedIndexChanged="ddlTahunChart2_SelectedIndexChanged" />
                                 </div>
                             </div>
-                        </ContentTemplate>
-                    </asp:UpdatePanel>
 
+                            <div class="card-body">
+                                <asp:Literal ID="Literal1" runat="server" Visible="false" />
+                                <canvas id="grafikChart2" style="width: 100%; height: 500px;"></canvas>
+                            </div>
+                    </div>
                   </div>
                 </div>
 
@@ -380,47 +369,90 @@
 
     </div>
 
-    <!-- Script Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <!-- Chart.js -->
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+        <script type="text/javascript">
+            var chart1, chart2;
+
+            function renderChart1(data) {
+                var ctx1 = document.getElementById('grafikChart1').getContext('2d');
+                if (chart1) chart1.destroy();
+                chart1 = new Chart(ctx1, {
+                    type: 'bar',
+                    data: {
+                        labels: data.labels,
+                        datasets: [
+                            {
+                                label: 'Progress',
+                                backgroundColor: 'rgba(255, 205, 86, 0.7)',
+                                data: data.progress
+                            },
+                            {
+                                label: 'Done',
+                                backgroundColor: 'rgba(75, 192, 192, 0.7)',
+                                data: data.done
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { position: 'top' } },
+                        scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } }}
+                    }
+                });
+            }
+
+            function renderChart2(data) {
+                var ctx2 = document.getElementById('grafikChart2').getContext('2d');
+                if (chart2) chart2.destroy();
+                chart2 = new Chart(ctx2, {
+                    type: 'bar',
+                    data: data,
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { position: 'top' } },
+                        scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }
+                    }
+                });
+            }
+
+            window.onload = function () {
+                // Render chart 1
+                var chart1Data = <%= grafikDataJSON.Text %>;
+                if(chart1Data) renderChart1(chart1Data);
+
+                // Render chart 2
+                var chart2Data = JSON.parse('<%= Literal1.Text %>');
+                if (chart2Data) renderChart2(chart2Data);
+            };
+        </script>
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            var chart1Data = <%= grafikDataJSON.Text %>;
+            // Restore tab aktif dari localStorage
+            var activeTabId = localStorage.getItem('activeTabId');
+            if (activeTabId) {
+                var triggerEl = document.querySelector('#' + activeTabId);
+                if (triggerEl) {
+                    // Untuk Bootstrap 4
+                    $(triggerEl).tab('show');
 
-        var ctx1 = document.getElementById('grafikChart1').getContext('2d');
-        new Chart(ctx1, {
-            type: 'bar',
-            data: {
-                labels: chart1Data.labels,
-                datasets: [
-                    {
-                        label: 'Progress',
-                        backgroundColor: 'rgba(255, 205, 86, 0.7)',
-                        data: chart1Data.progress
-                    },
-                    {
-                        label: 'Done',
-                        backgroundColor: 'rgba(75, 192, 192, 0.7)',
-                        data: chart1Data.done
-                    }
-                ]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { position: 'top' }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        ticks: { stepSize: 1 }
-                    }
+                    // Kalau Bootstrap 5, bisa pakai:
+                    // var tab = new bootstrap.Tab(triggerEl);
+                    // tab.show();
                 }
             }
+
+            // Simpan tab aktif ke localStorage saat tab diubah
+            $('#dashboardTab a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+                localStorage.setItem('activeTabId', e.target.id);
+            });
         });
-    });
     </script>
+
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
